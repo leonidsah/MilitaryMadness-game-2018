@@ -59,13 +59,13 @@ public class MainMenuScreen implements Screen{
 		menuFont_c.getData().setScale(FONT_SCALE * 0.3f);
 		menuFont_c.setColor(Color.GRAY);
 		
-		playt = new GlyphLayout(menuFont, "������");
-		playt_s = new GlyphLayout(menuFont_s, "������");
-		exitt = new GlyphLayout(menuFont, "�����");
-		exitt_s = new GlyphLayout(menuFont_s, "�����");
-		settingst = new GlyphLayout(menuFont, "���������");
-		settingst_s = new GlyphLayout(menuFont_s, "���������");
-		version = new GlyphLayout(menuFont_c, "������ " + GameControl.VERSION);
+		playt = new GlyphLayout(menuFont, "Играть");
+		playt_s = new GlyphLayout(menuFont_s, "Играть");
+		exitt = new GlyphLayout(menuFont, "Выход");
+		exitt_s = new GlyphLayout(menuFont_s, "Выход");
+		settingst = new GlyphLayout(menuFont, "Настройки");
+		settingst_s = new GlyphLayout(menuFont_s, "Настройки");
+		version = new GlyphLayout(menuFont_c, "Версия " + GameControl.VERSION);
 		
 		rolls = new Animation[1];
 		TextureRegion[][] player_animated_sheet = TextureRegion.split(new Texture("player_sheet.png"), GameScreen.PLAYER_PWIDTH, GameScreen.PLAYER_PHEIGHT);

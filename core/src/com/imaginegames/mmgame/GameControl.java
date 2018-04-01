@@ -9,7 +9,7 @@ public class GameControl extends Game {
 	public SpriteBatch batch;
 	
 	public static final String GENERATION = "Alpha"; 
-	public static final String RELEASE = "0.3.4"; // fonts added to game + xy_track in main menu
+	public static final String RELEASE = "0.3.4";
 	public static final String VERSION = GENERATION + " " + RELEASE;
 	
 	public static boolean ENGLISH_LANGUAGE = false;
