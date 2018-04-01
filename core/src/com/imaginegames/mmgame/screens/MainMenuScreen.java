@@ -15,9 +15,9 @@ import com.imaginegames.mmgame.GameControl;
 public class MainMenuScreen implements Screen{
 	
 	/*
-	RUS_CHARS = "йцукенгшщзхъфывапролджэячсмитьбюёЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮЁ";
+	RUS_CHARS = "Р№С†СѓРєРµРЅРіС€С‰Р·С…СЉС„С‹РІР°РїСЂРѕР»РґР¶СЌСЏС‡СЃРјРёС‚СЊР±СЋР™Р¦РЈРљР•РќР“РЁР©Р—РҐРЄР¤Р«Р’РђРџР РћР›Р”Р–Р­РЇР§РЎРњРРўР¬Р‘Р®";
 	ENG_CHARS = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM";
-	SYMBOLS = "1234567890!@#$%^&*()_-=+~`{}|/<>[],.:;'№?";
+	SYMBOLS = "1234567890!@#$%^&*()_-=+~`{}|/<>[],.:;'пїЅ?";
 	*/
 	
 	private static final float PLAY_Y = Gdx.graphics.getHeight() * 0.90f;
@@ -59,13 +59,13 @@ public class MainMenuScreen implements Screen{
 		menuFont_c.getData().setScale(FONT_SCALE * 0.3f);
 		menuFont_c.setColor(Color.GRAY);
 		
-		playt = new GlyphLayout(menuFont, "Играть");
-		playt_s = new GlyphLayout(menuFont_s, "Играть");
-		exitt = new GlyphLayout(menuFont, "Выход");
-		exitt_s = new GlyphLayout(menuFont_s, "Выход");
-		settingst = new GlyphLayout(menuFont, "Настройки");
-		settingst_s = new GlyphLayout(menuFont_s, "Настройки");
-		version = new GlyphLayout(menuFont_c, "Версия " + GameControl.VERSION);
+		playt = new GlyphLayout(menuFont, "пїЅпїЅпїЅпїЅпїЅпїЅ");
+		playt_s = new GlyphLayout(menuFont_s, "пїЅпїЅпїЅпїЅпїЅпїЅ");
+		exitt = new GlyphLayout(menuFont, "пїЅпїЅпїЅпїЅпїЅ");
+		exitt_s = new GlyphLayout(menuFont_s, "пїЅпїЅпїЅпїЅпїЅ");
+		settingst = new GlyphLayout(menuFont, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+		settingst_s = new GlyphLayout(menuFont_s, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+		version = new GlyphLayout(menuFont_c, "пїЅпїЅпїЅпїЅпїЅпїЅ " + GameControl.VERSION);
 		
 		rolls = new Animation[1];
 		TextureRegion[][] player_animated_sheet = TextureRegion.split(new Texture("player_sheet.png"), GameScreen.PLAYER_PWIDTH, GameScreen.PLAYER_PHEIGHT);

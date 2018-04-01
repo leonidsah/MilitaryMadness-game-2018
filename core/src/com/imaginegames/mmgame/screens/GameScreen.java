@@ -117,8 +117,8 @@ public class GameScreen implements Screen {
 	public void render(float delta) {
 		Gdx.gl.glClearColor(0.412f, 0.604f, 0.949f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		gamespeed = new GlyphLayout(gameFont, "???????? ???? x" + GameControl.GAMESPEED);
-		fps = new GlyphLayout(gameFont, "????? ? ???????: " + Gdx.graphics.getFramesPerSecond());
+		gamespeed = new GlyphLayout(gameFont, "Скорость x" + GameControl.GAMESPEED);
+		fps = new GlyphLayout(gameFont, "FPS: " + Gdx.graphics.getFramesPerSecond());
 		xtracker = new GlyphLayout(gameFont, "X: " + (int)x);
 		ytracker = new GlyphLayout(gameFont, "Y: " + (int)y);
 		

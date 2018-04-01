@@ -52,22 +52,22 @@ public class SettingsMenuScreen implements Screen {
 		font_c.setColor(Color.ROYAL);
 		font_u.setColor(Color.GRAY);
 		
-		language = new GlyphLayout(font, "????: ");
-		language_s = new GlyphLayout(font_s, "????: ");
-		xy = new GlyphLayout(font, "??????????? ???? X ? Y\n" + "??? ????????? ????????: ");
-		xy_s = new GlyphLayout(font_s, "??????????? ???? X ? Y\n" + "??? ????????? ????????: ");
-		back = new GlyphLayout(font, "?????");
-		back_s = new GlyphLayout(font_s, "?????");
-		fullscreen = new GlyphLayout(font, "????????????? ?????: ");
-		fullscreen_s = new GlyphLayout(font_s, "????????????? ?????: ");
-		on = new GlyphLayout(font_c, "????????");
-		off = new GlyphLayout(font_c, "?????????");
-		russian = new GlyphLayout(font_c, "???????");
+		language = new GlyphLayout(font, "Язык: ");
+		language_s = new GlyphLayout(font_s, "Язык: ");
+		xy = new GlyphLayout(font, "Отображение осей X и Y\n" + "для некоторых объектов: ");
+		xy_s = new GlyphLayout(font_s, "Отображение осей X и Y\n" + "для некоторых объектов: ");
+		back = new GlyphLayout(font, "Назад");
+		back_s = new GlyphLayout(font_s, "Назад");
+		fullscreen = new GlyphLayout(font, "Полноэкранный режим: ");
+		fullscreen_s = new GlyphLayout(font_s, "Полноэкранный режим: ");
+		on = new GlyphLayout(font_c, "Включено");
+		off = new GlyphLayout(font_c, "Отключено");
+		russian = new GlyphLayout(font_c, "Русский");
 		english = new GlyphLayout(font_c, "English");
-		gamespeed = new GlyphLayout(font, "???????? ????: ");
-		gamespeed_s = new GlyphLayout(font_s, "???????? ????: ");
+		gamespeed = new GlyphLayout(font, "Скорость игры: ");
+		gamespeed_s = new GlyphLayout(font_s, "Скорость игры: ");
 		gamespeed_c = new GlyphLayout(font_c, "x" + GameControl.GAMESPEED);
-		unavailable = new GlyphLayout(font_u, "?????");
+		unavailable = new GlyphLayout(font_u, "-");
 		
 		LANGUAGE_Y = Gdx.graphics.getHeight() * 0.95f - language.height;
 		XY_Y = LANGUAGE_Y - Gdx.graphics.getHeight() * 0.06f - xy.height;
@@ -103,7 +103,7 @@ public class SettingsMenuScreen implements Screen {
 			font_c.draw(game.batch, off, MainMenuScreen.BUTTON_X * 2 + xy.width, XY_Y + xy.height * 0.75f);
 		}
 		
-		if (GameControl.ENGLISH_LANGUAGE == false) {
+		if (!GameControl.ENGLISH_LANGUAGE) {
 		font_c.draw(game.batch, russian, MainMenuScreen.BUTTON_X * 2 + language.width, LANGUAGE_Y + language.height * 0.75f);
 		}
 		else {
@@ -128,10 +128,10 @@ public class SettingsMenuScreen implements Screen {
 		if (Gdx.input.getX() > MainMenuScreen.BUTTON_X && Gdx.input.getX() < MainMenuScreen.BUTTON_X + language.width && Gdx.graphics.getHeight() - Gdx.input.getY() > LANGUAGE_Y && Gdx.graphics.getHeight() - Gdx.input.getY() < LANGUAGE_Y + language.height) {
 			font_s.draw(game.batch, language_s, MainMenuScreen.BUTTON_X, LANGUAGE_Y + language.height);
 			if (Gdx.input.justTouched()) {
-				if (GameControl.ENGLISH_LANGUAGE == false) {
+				if (!GameControl.ENGLISH_LANGUAGE) {
 					GameControl.ENGLISH_LANGUAGE = true;
 				}
-				else if (GameControl.ENGLISH_LANGUAGE == true) {
+				else if (GameControl.ENGLISH_LANGUAGE) {
 					GameControl.ENGLISH_LANGUAGE = false;
 				}
 			}
@@ -139,12 +139,7 @@ public class SettingsMenuScreen implements Screen {
 		if (Gdx.input.getX() > MainMenuScreen.BUTTON_X && Gdx.input.getX() < MainMenuScreen.BUTTON_X + xy.width && Gdx.graphics.getHeight() - Gdx.input.getY() > XY_Y && Gdx.graphics.getHeight() - Gdx.input.getY() < XY_Y + xy.height) {
 			font_s.draw(game.batch, xy_s, MainMenuScreen.BUTTON_X, XY_Y + xy.height);
 			if (Gdx.input.justTouched()) {
-				if (!GameControl.XY_TRACKING) {
-					GameControl.XY_TRACKING = true;
-				}
-				else {
-					GameControl.XY_TRACKING = false;
-				}
+                GameControl.XY_TRACKING = !GameControl.XY_TRACKING;
 			}
 		}
 		
