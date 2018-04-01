@@ -8,8 +8,14 @@ public class GameControl extends Game {
 	
 	public SpriteBatch batch;
 	
-	public static final int WIDTH = 1100;
-	public static final int HEIGHT = 850;
+	public static final String GENERATION = "Alpha"; 
+	public static final String RELEASE = "0.3.4"; // fonts added to game + xy_track in main menu
+	public static final String VERSION = GENERATION + " " + RELEASE;
+	
+	public static boolean ENGLISH_LANGUAGE = false;
+	public static boolean XY_TRACKING = false;
+	public static float GAMESPEED = 1.0f;
+	public static boolean FULLSCREEN = false;
 	
 	@Override
 	public void create() {
