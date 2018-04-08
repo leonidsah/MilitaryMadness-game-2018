@@ -31,22 +31,53 @@ public class GameScreen implements Screen {
 	
 	private static final int GAMEPAUSE_PWIDTH = 256;
 	private static final int GAMEPAUSE_PHEIGHT = 256;
-	
-	private static final float GAMEPAUSE_SCALE = 0.2f;
-	
+	private static final float GAMEPAUSE_SCALE = 0.375f;
+
+	private static final int SHOOT_BUTTOM_PWIDTH = 256;
+	private static final int SHOOT_BUTTOM_PHEIGHT= 256;
+	private static final float SHOOT_BUTTON_SCALE = 0.875f;
+
+	private static final int STAT_BUTTOM_PWIDTH = 256;
+	private static final int STAT_BUTTOM_PHEIGHT= 256;
+	private static final float STAT_BUTTON_SCALE = 0.4375f;
+
 	private static final float GAMEPAUSE_WIDTH = GAMEPAUSE_PWIDTH * GAMEPAUSE_SCALE;
 	private static final float GAMEPAUSE_HEIGHT = GAMEPAUSE_PHEIGHT * GAMEPAUSE_SCALE;
 	private static final float GAMEPAUSE_X = Gdx.graphics.getWidth() - GAMEPAUSE_WIDTH;
 	private static final float GAMEPAUSE_Y = Gdx.graphics.getHeight() - GAMEPAUSE_HEIGHT;
-	
+
+	private static final float SHOOT_BUTTON_WIDTH = SHOOT_BUTTOM_PWIDTH * SHOOT_BUTTON_SCALE;
+	private static final float SHOOT_BUTTON_HEIGHT = SHOOT_BUTTOM_PHEIGHT * SHOOT_BUTTON_SCALE;
+	private static final float SHOOT_BUTTON_X = Gdx.graphics.getWidth() - SHOOT_BUTTON_WIDTH;
+	private static final float SHOOT_BUTTON_Y = 0;
+
+	private static final float STAT_BUTTON_WIDTH = STAT_BUTTOM_PWIDTH * STAT_BUTTON_SCALE;
+	private static final float STAT_BUTTON_HEIGHT = STAT_BUTTOM_PHEIGHT * STAT_BUTTON_SCALE;
+	private static final float STAT_BUTTON_X = Gdx.graphics.getWidth() - GAMEPAUSE_WIDTH - STAT_BUTTON_WIDTH;
+	private static final float STAT_BUTTON_Y = Gdx.graphics.getHeight() - STAT_BUTTON_HEIGHT;
+
+	private static final int MOVE_BUTTOM_PWIDTH = 256;
+	private static final int MOVE_BUTTOM_PHEIGHT= 256;
+	private static final float MOVE_BUTTON_SCALE = 0.625f;
+
+	private static final float MOVE_BUTTON_WIDTH = MOVE_BUTTOM_PWIDTH * MOVE_BUTTON_SCALE;
+	private static final float MOVE_BUTTON_HEIGHT = MOVE_BUTTOM_PHEIGHT * MOVE_BUTTON_SCALE;
+	private static final float LEFT_X = 0;
+	private static final float LEFT_Y = MOVE_BUTTON_HEIGHT * 0.75f;
+	private static final float DOWN_X = MOVE_BUTTON_WIDTH;
+	private static final float DOWN_Y = 0;
+	private static final float RIGHT_X = MOVE_BUTTON_WIDTH * 2;
+	private static final float RIGHT_Y = MOVE_BUTTON_HEIGHT * 0.75f;
+	private static final float UP_X = MOVE_BUTTON_WIDTH;
+	private static final float UP_Y = MOVE_BUTTON_HEIGHT * 1.5f;
+
+
 	public static final float SHOOT_COOLDOWN = 1.1f;
 	public static final float MIN_FIREBALL_SPAWN_TIME = 0.4f;
 	public static final float MAX_FIREBALL_SPAWN_TIME = 1.2f;
-	
-	private boolean show_statistics = false;
 
 	Animation<?>[] rolls;
-	Texture x_line, y_line, gamepause, gamepause_selected;
+	Texture x_line, y_line, gamepause, shoot_button, move_button, stat_button;
 	Texture blank;
 	
 	float x;
@@ -87,7 +118,10 @@ public class GameScreen implements Screen {
 		x_line = new Texture("x_line.png");
 		y_line = new Texture("y_line.png");
 		gamepause = new Texture("gamepause.png");
-		gamepause_selected = new Texture("gamepause_s.png");
+
+		move_button = new Texture("move_button.png");
+		shoot_button = new Texture("shoot_button.png");
+		stat_button = new Texture("stat_button.png");
 		
 		random = new Random();
 		fireballsSpawnTimer = 
@@ -132,7 +166,7 @@ public class GameScreen implements Screen {
 			y += SPEED * delta;
 			PLAYER_DIRECTION = 1;
 		}
-		else if (Gdx.input.isKeyPressed(Keys.W) && Gdx.input.isKeyPressed(Keys.A)) {
+		if (Gdx.input.isKeyPressed(Keys.W) && Gdx.input.isKeyPressed(Keys.A)) {
 			x -= SPEED * delta;
 			y += SPEED * delta;
 			PLAYER_DIRECTION = -1;
@@ -148,21 +182,29 @@ public class GameScreen implements Screen {
 			y -= SPEED * delta;
 			PLAYER_DIRECTION = -1;
 		}
-	
-	else if (Gdx.input.isKeyPressed(Keys.A)) {
-		x -= SPEED * delta;
-		PLAYER_DIRECTION = -1;
-	}
-	else if (Gdx.input.isKeyPressed(Keys.D)) {
-		x += SPEED * delta;
-		PLAYER_DIRECTION = 1;
-	}
-	else if (Gdx.input.isKeyPressed(Keys.W)) {
-		y += SPEED * delta;
-	}
-	else if (Gdx.input.isKeyPressed(Keys.S)) {
-		y -= SPEED * delta;
-	}
+	//Android movement code
+		//Left
+		if (Gdx.input.getX() >= LEFT_X && Gdx.input.getX() < LEFT_X + MOVE_BUTTON_WIDTH && Gdx.graphics.getHeight() - Gdx.input.getY() >= LEFT_Y &&
+				Gdx.graphics.getHeight() - Gdx.input.getY() < LEFT_Y + MOVE_BUTTON_HEIGHT && Gdx.input.isTouched()) {
+			x -= SPEED * delta;
+			PLAYER_DIRECTION = -1;
+		}
+		//Down
+		if (Gdx.input.getX() >= DOWN_X && Gdx.input.getX() < DOWN_X + MOVE_BUTTON_WIDTH && Gdx.graphics.getHeight() - Gdx.input.getY() >= DOWN_Y &&
+				Gdx.graphics.getHeight() - Gdx.input.getY() < DOWN_Y + MOVE_BUTTON_HEIGHT && Gdx.input.isTouched()) {
+			y -= SPEED * delta;
+		}
+		//Right
+		if (Gdx.input.getX() >= RIGHT_X && Gdx.input.getX() < RIGHT_X + MOVE_BUTTON_WIDTH && Gdx.graphics.getHeight() - Gdx.input.getY() >= RIGHT_Y &&
+				Gdx.graphics.getHeight() - Gdx.input.getY() < RIGHT_Y + MOVE_BUTTON_HEIGHT && Gdx.input.isTouched()) {
+			x += SPEED * delta;
+			PLAYER_DIRECTION = 1;
+		}
+		//Up
+		if (Gdx.input.getX() >= UP_X && Gdx.input.getX() < UP_X + MOVE_BUTTON_WIDTH && Gdx.graphics.getHeight() - Gdx.input.getY() >= UP_Y &&
+				Gdx.graphics.getHeight() - Gdx.input.getY() < UP_Y + MOVE_BUTTON_HEIGHT && Gdx.input.isTouched()) {
+			y += SPEED * delta;
+		}
 	// Ground limitation
 	if (y < 0) {
 		y = 0;
@@ -172,13 +214,15 @@ public class GameScreen implements Screen {
 		
 		//Rockets spawn/control code
 		shootTimer += delta;
-		if (Gdx.input.justTouched() && shootTimer >= SHOOT_COOLDOWN) {
-			shootTimer = 0;
-			if (PLAYER_DIRECTION == 1) {
-				bullets.add(new Bullet(x + PLAYER_WIDTH, y + PLAYER_HEIGHT / 4 - Bullet.HEIGHT / 2, PLAYER_DIRECTION));
-			}
-			else if (PLAYER_DIRECTION == -1) {
-				bullets.add(new Bullet(x - Bullet.WIDTH, y + PLAYER_HEIGHT / 4 - Bullet.HEIGHT / 2, PLAYER_DIRECTION));
+		if (Gdx.input.getX() >= SHOOT_BUTTON_X && Gdx.input.getX() <= SHOOT_BUTTON_X + SHOOT_BUTTON_WIDTH && Gdx.graphics.getHeight() - Gdx.input.getY() >= SHOOT_BUTTON_Y &&
+				Gdx.graphics.getHeight() - Gdx.input.getY() <= SHOOT_BUTTON_Y + SHOOT_BUTTON_HEIGHT) {
+			if (Gdx.input.justTouched() && shootTimer >= SHOOT_COOLDOWN) {
+				shootTimer = 0;
+				if (PLAYER_DIRECTION == 1) {
+					bullets.add(new Bullet(x + PLAYER_WIDTH, y + PLAYER_HEIGHT / 4 - Bullet.HEIGHT / 2, PLAYER_DIRECTION));
+				} else if (PLAYER_DIRECTION == -1) {
+					bullets.add(new Bullet(x - Bullet.WIDTH, y + PLAYER_HEIGHT / 4 - Bullet.HEIGHT / 2, PLAYER_DIRECTION));
+				}
 			}
 		}
 		//Fireballs spawn
@@ -187,7 +231,7 @@ public class GameScreen implements Screen {
 			fireballsSpawnTimer = random.nextFloat() * (MAX_FIREBALL_SPAWN_TIME - MIN_FIREBALL_SPAWN_TIME) + MIN_FIREBALL_SPAWN_TIME;
 			fireballs.add(new Fireball(random.nextInt(Gdx.graphics.getHeight() - (int)Math.ceil(Fireball.HEIGHT))));
 		}
-		
+
 		//Fireballs update
 		ArrayList<Fireball> fireballs_to_remove = new ArrayList<Fireball>();
 		for (Fireball fireball : fireballs) {
@@ -241,35 +285,12 @@ public class GameScreen implements Screen {
 		explosions.removeAll(explosions_to_remove);
 		fireballs.removeAll(fireballs_to_remove);
 		bullets.removeAll(bullets_to_remove);
-		// TO CONSOLE OPTIONS (INPUT / DEVELOPER BUTTONS) \/ \/ \/
-		if (Gdx.input.isKeyJustPressed(Keys.TAB)) {
-			if (!GameControl.XY_TRACKING) {
-				GameControl.XY_TRACKING = true;
-			}
-			else {
-				GameControl.XY_TRACKING = false;
-			}
+		//Statistics output
+		if (Gdx.input.getX() >= STAT_BUTTON_X && Gdx.input.getX() < STAT_BUTTON_X + STAT_BUTTON_WIDTH && Gdx.graphics.getHeight() - Gdx.input.getY() >= STAT_BUTTON_Y &&
+				Gdx.graphics.getHeight() - Gdx.input.getY() < STAT_BUTTON_Y + STAT_BUTTON_HEIGHT && Gdx.input.justTouched()) {
+			GameControl.XY_TRACKING = !GameControl.XY_TRACKING;
+			GameControl.SHOW_STAT = !GameControl.SHOW_STAT;
 		}
-		else if (Gdx.input.isKeyJustPressed(Keys.SHIFT_LEFT)) {
-			if (GameControl.GAMESPEED == 1.0f) {
-				GameControl.GAMESPEED = 0.5f;
-			}
-			else if (GameControl.GAMESPEED == 0.5f) {
-				GameControl.GAMESPEED = 0.1f;
-			}
-			else {
-				GameControl.GAMESPEED = 1.0f;
-			}
-		}
-		else if (Gdx.input.isKeyJustPressed(Keys.F3)) {
-			if (!show_statistics) {
-				show_statistics = true;
-			}
-			else {
-				show_statistics = false;
-			}
-		}
-		// TO CONSOLE OUTPUT ^ ^ ^
 	
 		if (health <= 0) {
 			dead = true;
@@ -297,41 +318,8 @@ public class GameScreen implements Screen {
 		else if (PLAYER_DIRECTION == -1) {
 			game.batch.draw(currentFrame, x + PLAYER_WIDTH, y, -PLAYER_WIDTH, PLAYER_HEIGHT);
 		}
-				
-		if (GameControl.XY_TRACKING) {
-			game.batch.draw(x_line, x, y, 1, PLAYER_HEIGHT);
-			game.batch.draw(y_line, x, y, PLAYER_WIDTH, 1);
-			game.batch.draw(x_line, x + PLAYER_WIDTH, y, 1, PLAYER_HEIGHT);
-			game.batch.draw(y_line, x, y + PLAYER_HEIGHT, PLAYER_WIDTH, 1);
-			}
-		if (GameControl.XY_TRACKING) {
-			for (Fireball fireball : fireballs) {
-				game.batch.draw(x_line, fireball.x, fireball.y, 1, Fireball.HEIGHT);
-				game.batch.draw(y_line, fireball.x, fireball.y, Fireball.WIDTH, 1);
-				game.batch.draw(x_line, fireball.x + Fireball.WIDTH, fireball.y, 1, Fireball.HEIGHT);
-				game.batch.draw(y_line, fireball.x, fireball.y + Fireball.HEIGHT, Fireball.WIDTH, 1);
-			}
-		}
+
 		game.batch.draw(gamepause, GAMEPAUSE_X, GAMEPAUSE_Y, GAMEPAUSE_WIDTH, GAMEPAUSE_HEIGHT);
-		//Gamepause button
-		if (Gdx.input.getX() > GAMEPAUSE_X && Gdx.input.getX() <= GAMEPAUSE_X + GAMEPAUSE_WIDTH && Gdx.graphics.getHeight() - Gdx.input.getY() > GAMEPAUSE_Y 
-				&& Gdx.graphics.getHeight() - Gdx.input.getY() <= GAMEPAUSE_Y + GAMEPAUSE_HEIGHT) {
-			game.batch.draw(gamepause_selected, GAMEPAUSE_X, GAMEPAUSE_Y, GAMEPAUSE_WIDTH, GAMEPAUSE_HEIGHT);
-			if (Gdx.input.isTouched()) {
-				this.dispose();
-				game.setScreen(new MainMenuScreen(game));
-			}
-		}
-		if (Gdx.input.isKeyJustPressed(Keys.ESCAPE)) {
-			this.dispose();
-			game.setScreen(new MainMenuScreen(game));
-		}
-		if (show_statistics) {
-			gameFont.draw(game.batch, gamespeed, 0, Gdx.graphics.getHeight() * 0.97f + gamespeed.height);
-			gameFont.draw(game.batch, fps, 0, Gdx.graphics.getHeight() * 0.94f + fps.height);
-			gameFont.draw(game.batch, xtracker, 0, Gdx.graphics.getHeight() * 0.91f + xtracker.height);
-			gameFont.draw(game.batch, ytracker, 0, Gdx.graphics.getHeight() * 0.88f + ytracker.height);
-		}
 		//Draw health bar
 		if (health > 0.8f) {
 			game.batch.setColor(0.000f, 1.000f, 0.000f, 1);
@@ -350,6 +338,7 @@ public class GameScreen implements Screen {
 		}
 		game.batch.draw(blank, x + (PLAYER_WIDTH - stat_bar_width * health) / 2, y + PLAYER_HEIGHT + 12, stat_bar_width * health, 6);
 		game.batch.setColor(Color.WHITE);
+		//Draw reload bar
 		if (shootTimer > 0 && shootTimer<= 1) {
 			if (shootTimer > 0.9f) {
 				game.batch.setColor(1.000f, 1.000f, 0.000f, 1f);
@@ -370,6 +359,77 @@ public class GameScreen implements Screen {
 				game.batch.setColor(1.000f, 1.000f, 0.938f, 1f);
 			}
 			game.batch.draw(blank, x + (PLAYER_WIDTH - stat_bar_width * shootTimer) / 2, y + PLAYER_HEIGHT + 20, stat_bar_width * shootTimer, 4);
+			game.batch.setColor(Color.WHITE);
+		}
+		//Draw interface buttons
+			//Pause
+		if (Gdx.input.getX() > GAMEPAUSE_X && Gdx.input.getX() <= GAMEPAUSE_X + GAMEPAUSE_WIDTH && Gdx.graphics.getHeight() - Gdx.input.getY() > GAMEPAUSE_Y
+				&& Gdx.graphics.getHeight() - Gdx.input.getY() <= GAMEPAUSE_Y + GAMEPAUSE_HEIGHT && Gdx.input.justTouched()) {
+				game.setScreen(new MainMenuScreen(game));
+				this.dispose();
+		}
+			//Show statistics button
+		game.batch.draw(stat_button, STAT_BUTTON_X, STAT_BUTTON_Y, STAT_BUTTON_WIDTH, STAT_BUTTON_HEIGHT);
+			//Shoot button
+		game.batch.draw(shoot_button, SHOOT_BUTTON_X, SHOOT_BUTTON_Y, SHOOT_BUTTON_WIDTH, SHOOT_BUTTON_HEIGHT);
+			//Android movement buttons
+                //Left
+		game.batch.draw(move_button, LEFT_X, LEFT_Y, MOVE_BUTTON_WIDTH / 2, MOVE_BUTTON_HEIGHT / 2, MOVE_BUTTON_WIDTH, MOVE_BUTTON_HEIGHT, 1, 1, 180, 0, 0, MOVE_BUTTOM_PWIDTH, MOVE_BUTTOM_PHEIGHT, false, false);
+		        //Down
+		game.batch.draw(move_button, DOWN_X, DOWN_Y, MOVE_BUTTON_WIDTH / 2, MOVE_BUTTON_HEIGHT / 2, MOVE_BUTTON_WIDTH, MOVE_BUTTON_HEIGHT, 1, 1, -90, 0, 0, MOVE_BUTTOM_PWIDTH, MOVE_BUTTOM_PHEIGHT, false, false);
+                //Right
+        game.batch.draw(move_button, RIGHT_X, RIGHT_Y, MOVE_BUTTON_WIDTH / 2, MOVE_BUTTON_HEIGHT / 2, MOVE_BUTTON_WIDTH, MOVE_BUTTON_HEIGHT, 1, 1, 0, 0, 0, MOVE_BUTTOM_PWIDTH, MOVE_BUTTOM_PHEIGHT, false, false);
+                //Up
+        game.batch.draw(move_button, UP_X, UP_Y, MOVE_BUTTON_WIDTH / 2, MOVE_BUTTON_HEIGHT / 2, MOVE_BUTTON_WIDTH, MOVE_BUTTON_HEIGHT, 1, 1, 90, 0, 0, MOVE_BUTTOM_PWIDTH, MOVE_BUTTOM_PHEIGHT, false, false);
+
+        //Draw  X and Y tracking
+		if (GameControl.XY_TRACKING) {
+			game.batch.draw(x_line, x, y, 1, PLAYER_HEIGHT);
+			game.batch.draw(y_line, x, y, PLAYER_WIDTH, 1);
+			game.batch.draw(x_line, x + PLAYER_WIDTH, y, 1, PLAYER_HEIGHT);
+			game.batch.draw(y_line, x, y + PLAYER_HEIGHT, PLAYER_WIDTH, 1);
+			for (Fireball fireball : fireballs) {
+				game.batch.draw(x_line, fireball.x, fireball.y, 1, Fireball.HEIGHT);
+				game.batch.draw(y_line, fireball.x, fireball.y, Fireball.WIDTH, 1);
+				game.batch.draw(x_line, fireball.x + Fireball.WIDTH, fireball.y, 1, Fireball.HEIGHT);
+				game.batch.draw(y_line, fireball.x, fireball.y + Fireball.HEIGHT, Fireball.WIDTH, 1);
+			}
+			game.batch.draw(y_line, UP_X, UP_Y, MOVE_BUTTON_WIDTH, 1);
+			game.batch.draw(y_line, UP_X, UP_Y + MOVE_BUTTON_HEIGHT, MOVE_BUTTON_WIDTH, 1);
+			game.batch.draw(y_line, LEFT_X, LEFT_Y, MOVE_BUTTON_WIDTH, 1);
+			game.batch.draw(y_line, LEFT_X, LEFT_Y + MOVE_BUTTON_HEIGHT, MOVE_BUTTON_WIDTH, 1);
+			game.batch.draw(y_line, RIGHT_X, RIGHT_Y, MOVE_BUTTON_WIDTH, 1);
+			game.batch.draw(y_line, RIGHT_X, RIGHT_Y + MOVE_BUTTON_HEIGHT, MOVE_BUTTON_WIDTH, 1);
+			game.batch.draw(y_line, DOWN_X, DOWN_Y, MOVE_BUTTON_WIDTH, 1);
+			game.batch.draw(y_line, DOWN_X, DOWN_Y + MOVE_BUTTON_HEIGHT, MOVE_BUTTON_WIDTH, 1);
+
+			game.batch.draw(x_line, RIGHT_X, RIGHT_Y, 1, MOVE_BUTTON_HEIGHT);
+			game.batch.draw(x_line, RIGHT_X + MOVE_BUTTON_WIDTH, RIGHT_Y, 1, MOVE_BUTTON_HEIGHT);
+			game.batch.draw(x_line, UP_X, UP_Y, 1, MOVE_BUTTON_HEIGHT);
+			game.batch.draw(x_line, UP_X + MOVE_BUTTON_WIDTH, UP_Y, 1, MOVE_BUTTON_HEIGHT);
+			game.batch.draw(x_line, DOWN_X, DOWN_Y, 1, MOVE_BUTTON_HEIGHT);
+			game.batch.draw(x_line, DOWN_X + MOVE_BUTTON_WIDTH, DOWN_Y, 1, MOVE_BUTTON_HEIGHT);
+			game.batch.draw(x_line, LEFT_X, LEFT_Y, 1, MOVE_BUTTON_HEIGHT);
+			game.batch.draw(x_line, LEFT_X + MOVE_BUTTON_WIDTH, LEFT_Y, 1, MOVE_BUTTON_HEIGHT);
+
+			game.batch.draw(y_line, SHOOT_BUTTON_X, SHOOT_BUTTON_Y, SHOOT_BUTTON_WIDTH, 1);
+			game.batch.draw(y_line, SHOOT_BUTTON_X, SHOOT_BUTTON_Y + SHOOT_BUTTON_HEIGHT, SHOOT_BUTTON_WIDTH, 1);
+			game.batch.draw(x_line, SHOOT_BUTTON_X, SHOOT_BUTTON_Y, 1, SHOOT_BUTTON_HEIGHT);
+			game.batch.draw(x_line, SHOOT_BUTTON_X + SHOOT_BUTTON_WIDTH, SHOOT_BUTTON_Y, 1, SHOOT_BUTTON_HEIGHT);
+
+			game.batch.draw(y_line, STAT_BUTTON_X, STAT_BUTTON_Y, STAT_BUTTON_WIDTH, 1);
+			game.batch.draw(y_line, STAT_BUTTON_X, STAT_BUTTON_Y + STAT_BUTTON_HEIGHT, STAT_BUTTON_WIDTH, 1);
+			game.batch.draw(x_line, STAT_BUTTON_X, STAT_BUTTON_Y, 1, STAT_BUTTON_HEIGHT);
+			game.batch.draw(x_line, STAT_BUTTON_X + STAT_BUTTON_WIDTH, STAT_BUTTON_Y, 1, STAT_BUTTON_HEIGHT);
+		}
+
+		//Draw statistics
+		if (GameControl.SHOW_STAT) {
+			game.batch.setColor(Color.GOLD);
+			gameFont.draw(game.batch, gamespeed, 0, Gdx.graphics.getHeight() * 0.97f + gamespeed.height);
+			gameFont.draw(game.batch, fps, 0, Gdx.graphics.getHeight() * 0.94f + fps.height);
+			gameFont.draw(game.batch, xtracker, 0, Gdx.graphics.getHeight() * 0.91f + xtracker.height);
+			gameFont.draw(game.batch, ytracker, 0, Gdx.graphics.getHeight() * 0.88f + ytracker.height);
 			game.batch.setColor(Color.WHITE);
 		}
 		game.batch.end();

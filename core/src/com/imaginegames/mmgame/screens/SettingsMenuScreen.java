@@ -119,27 +119,23 @@ public class SettingsMenuScreen implements Screen {
 		
 		if (Gdx.input.getX() > MainMenuScreen.BUTTON_X && Gdx.input.getX() < MainMenuScreen.BUTTON_X + back.width && Gdx.graphics.getHeight() - Gdx.input.getY() > BACK_Y && Gdx.graphics.getHeight() - Gdx.input.getY() < BACK_Y + back.height) {
 			font_s.draw(game.batch, back_s, MainMenuScreen.BUTTON_X, BACK_Y + back.height);
-			if (Gdx.input.isTouched()) {
-				this.dispose();
+			if (Gdx.input.justTouched()) {
 				game.setScreen(new MainMenuScreen(game));
+				this.dispose();
 			}
 		}
 		
 		if (Gdx.input.getX() > MainMenuScreen.BUTTON_X && Gdx.input.getX() < MainMenuScreen.BUTTON_X + language.width && Gdx.graphics.getHeight() - Gdx.input.getY() > LANGUAGE_Y && Gdx.graphics.getHeight() - Gdx.input.getY() < LANGUAGE_Y + language.height) {
 			font_s.draw(game.batch, language_s, MainMenuScreen.BUTTON_X, LANGUAGE_Y + language.height);
 			if (Gdx.input.justTouched()) {
-				if (!GameControl.ENGLISH_LANGUAGE) {
-					GameControl.ENGLISH_LANGUAGE = true;
-				}
-				else if (GameControl.ENGLISH_LANGUAGE) {
-					GameControl.ENGLISH_LANGUAGE = false;
-				}
+				GameControl.ENGLISH_LANGUAGE = !GameControl.ENGLISH_LANGUAGE;
 			}
 		}
 		if (Gdx.input.getX() > MainMenuScreen.BUTTON_X && Gdx.input.getX() < MainMenuScreen.BUTTON_X + xy.width && Gdx.graphics.getHeight() - Gdx.input.getY() > XY_Y && Gdx.graphics.getHeight() - Gdx.input.getY() < XY_Y + xy.height) {
 			font_s.draw(game.batch, xy_s, MainMenuScreen.BUTTON_X, XY_Y + xy.height);
 			if (Gdx.input.justTouched()) {
                 GameControl.XY_TRACKING = !GameControl.XY_TRACKING;
+				GameControl.SHOW_STAT = !GameControl.SHOW_STAT;
 			}
 		}
 		
@@ -164,13 +160,8 @@ public class SettingsMenuScreen implements Screen {
 		if (Gdx.input.getX() > MainMenuScreen.BUTTON_X && Gdx.input.getX() < MainMenuScreen.BUTTON_X + fullscreen.width && Gdx.graphics.getHeight() - Gdx.input.getY() > FULLSCREEN_Y && Gdx.graphics.getHeight() - Gdx.input.getY() < FULLSCREEN_Y + fullscreen.height) {
 			font_s.draw(game.batch, fullscreen_s, MainMenuScreen.BUTTON_X,FULLSCREEN_Y + fullscreen.height);
 			if (Gdx.input.justTouched()) {
-				if (!GameControl.FULLSCREEN) {
-					GameControl.FULLSCREEN = true;
-					//Gdx.graphics.setFullscreenMode(null);
-				}
-				else {
-					GameControl.FULLSCREEN = false;
-				}
+				//Gdx.graphics.setFullscreenMode(null);
+				GameControl.FULLSCREEN = !GameControl.FULLSCREEN;
 			}
 		}
 		game.batch.end();

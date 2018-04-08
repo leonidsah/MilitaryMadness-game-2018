@@ -109,25 +109,25 @@ public class MainMenuScreen implements Screen{
 		//Play button
 		if (Gdx.input.getX() > BUTTON_X && Gdx.input.getX() < BUTTON_X + playt.width && Gdx.graphics.getHeight() - Gdx.input.getY() > PLAY_Y && Gdx.graphics.getHeight() - Gdx.input.getY() < PLAY_Y + playt.height) {
 			menuFont_s.draw(game.batch, playt_s, BUTTON_X, PLAY_Y + playt.height);
-			if (Gdx.input.isTouched()) {
-				this.dispose();
+			if (Gdx.input.justTouched()) {
 				game.setScreen(new GameScreen(game));
+				this.dispose();
 			}
 		}
 		
 		//Settings button
 		if (Gdx.input.getX() > BUTTON_X && Gdx.input.getX() < BUTTON_X + settingst.width && Gdx.graphics.getHeight() - Gdx.input.getY() > SETTINGS_Y && Gdx.graphics.getHeight() - Gdx.input.getY() < SETTINGS_Y + settingst.height) {
 			menuFont_s.draw(game.batch, settingst_s, BUTTON_X, SETTINGS_Y + settingst.height);
-			if (Gdx.input.isTouched()) {
-				this.dispose();
+			if (Gdx.input.justTouched()) {
 				game.setScreen(new SettingsMenuScreen(game));
+				this.dispose();
 			}
 		}
 		
 		//Exit button
 		if (Gdx.input.getX() > BUTTON_X && Gdx.input.getX() < BUTTON_X + exitt.width && Gdx.graphics.getHeight() - Gdx.input.getY() > EXIT_Y && Gdx.graphics.getHeight() - Gdx.input.getY() < EXIT_Y + exitt.height) {
 			menuFont_s.draw(game.batch, exitt_s, BUTTON_X, EXIT_Y + exitt.height);
-			if (Gdx.input.isTouched()) {
+			if (Gdx.input.justTouched()) {
 				Gdx.app.exit();
 			}
 		}
