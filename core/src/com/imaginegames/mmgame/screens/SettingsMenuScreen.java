@@ -96,7 +96,7 @@ public class SettingsMenuScreen implements Screen {
 		font.draw(game.batch, fullscreen, MainMenuScreen.BUTTON_X, FULLSCREEN_Y + fullscreen.height);
 		font_c.draw(game.batch, gamespeed_c, MainMenuScreen.BUTTON_X * 2 + gamespeed.width, GAMESPEED_Y + gamespeed.height * 0.75f);
 		
-		if (GameControl.XY_TRACKING) {
+		if (GameControl.SHOW_STAT) {
 			font_c.draw(game.batch, on, MainMenuScreen.BUTTON_X * 2 + xy.width, XY_Y + xy.height * 0.75f);
 		}
 		else {
@@ -116,7 +116,7 @@ public class SettingsMenuScreen implements Screen {
 		else {
 			font_u.draw(game.batch, unavailable, MainMenuScreen.BUTTON_X * 2 + fullscreen.width, FULLSCREEN_Y + fullscreen.height * 0.75f);
 		}
-		
+		//Back button
 		if (Gdx.input.getX() > MainMenuScreen.BUTTON_X && Gdx.input.getX() < MainMenuScreen.BUTTON_X + back.width && Gdx.graphics.getHeight() - Gdx.input.getY() > BACK_Y && Gdx.graphics.getHeight() - Gdx.input.getY() < BACK_Y + back.height) {
 			font_s.draw(game.batch, back_s, MainMenuScreen.BUTTON_X, BACK_Y + back.height);
 			if (Gdx.input.justTouched()) {
@@ -124,17 +124,17 @@ public class SettingsMenuScreen implements Screen {
 				this.dispose();
 			}
 		}
-		
+		//Language
 		if (Gdx.input.getX() > MainMenuScreen.BUTTON_X && Gdx.input.getX() < MainMenuScreen.BUTTON_X + language.width && Gdx.graphics.getHeight() - Gdx.input.getY() > LANGUAGE_Y && Gdx.graphics.getHeight() - Gdx.input.getY() < LANGUAGE_Y + language.height) {
 			font_s.draw(game.batch, language_s, MainMenuScreen.BUTTON_X, LANGUAGE_Y + language.height);
 			if (Gdx.input.justTouched()) {
 				GameControl.ENGLISH_LANGUAGE = !GameControl.ENGLISH_LANGUAGE;
 			}
 		}
+		//Show stat
 		if (Gdx.input.getX() > MainMenuScreen.BUTTON_X && Gdx.input.getX() < MainMenuScreen.BUTTON_X + xy.width && Gdx.graphics.getHeight() - Gdx.input.getY() > XY_Y && Gdx.graphics.getHeight() - Gdx.input.getY() < XY_Y + xy.height) {
 			font_s.draw(game.batch, xy_s, MainMenuScreen.BUTTON_X, XY_Y + xy.height);
 			if (Gdx.input.justTouched()) {
-                GameControl.XY_TRACKING = !GameControl.XY_TRACKING;
 				GameControl.SHOW_STAT = !GameControl.SHOW_STAT;
 			}
 		}

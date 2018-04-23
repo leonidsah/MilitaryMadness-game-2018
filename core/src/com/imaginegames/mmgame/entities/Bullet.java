@@ -57,7 +57,7 @@ public class Bullet {
 	public void render(SpriteBatch batch, float delta) {
 		if (speed_direction == 1) {
 			batch.draw((TextureRegion) BULLET_ANIMATION.getKeyFrame(stateTime, true), x, y, WIDTH, HEIGHT);
-			if (GameControl.XY_TRACKING == true) {
+			if (GameControl.SHOW_STAT) {
 			batch.draw(x_line, x + WIDTH, y, 1, HEIGHT);
 			batch.draw(x_line, x, y, 1, HEIGHT);
 			batch.draw(y_line, x, y + HEIGHT, WIDTH, 1);
@@ -66,7 +66,7 @@ public class Bullet {
 		}
 		else if (speed_direction == -1) {
 			batch.draw((TextureRegion) BULLET_ANIMATION.getKeyFrame(stateTime, true), x + WIDTH, y, -WIDTH, HEIGHT);
-			if (GameControl.XY_TRACKING) {
+			if (GameControl.SHOW_STAT) {
 			batch.draw(x_line, x, y, 1, HEIGHT);
 			batch.draw(x_line, x + WIDTH, y, 1, HEIGHT);
 			batch.draw(y_line, x, y, WIDTH, 1);

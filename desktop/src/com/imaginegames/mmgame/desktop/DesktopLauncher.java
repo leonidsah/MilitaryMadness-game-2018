@@ -8,14 +8,13 @@ public class DesktopLauncher {
 	public static void main (String[] arg) {
 			
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-		
 		//config.width = LwjglApplicationConfiguration.getDesktopDisplayMode().width - 100;
         //config.height = LwjglApplicationConfiguration.getDesktopDisplayMode().height - 200;
-		config.width = 1100;
-		config.height = 850;
-        config.resizable = true;
+		config.foregroundFPS = 120;
+		config.vSyncEnabled = false;
+		config.width = GameControl.WIDTH;
+		config.height = GameControl.HEIGHT;
         config.fullscreen = GameControl.FULLSCREEN;
-		config.foregroundFPS = 60;
 		config.title = "Millitary Madness" + " " + GameControl.VERSION;
 		new LwjglApplication(new GameControl(), config);
 	}

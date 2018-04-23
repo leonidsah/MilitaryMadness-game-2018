@@ -12,7 +12,7 @@ public class Explosion {
 	public static float WIDTH;
 	public static float HEIGHT;
 	private static final float ANIMATION_SPEED = 0.04f;
-	private static final float SCALE = 1.2f;
+	private static final float SCALE = 1.25f;
 	
 	private static Animation<?> ANIMATION;
 	private float stateTime;

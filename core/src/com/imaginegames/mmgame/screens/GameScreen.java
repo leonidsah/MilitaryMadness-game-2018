@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -18,10 +17,9 @@ import com.imaginegames.mmgame.entities.Bullet;
 import com.imaginegames.mmgame.entities.Explosion;
 import com.imaginegames.mmgame.entities.Fireball;
 import com.imaginegames.mmgame.tools.CollisionRect;
+import com.imaginegames.mmgame.attachable.DesktopControl;;
 
 public class GameScreen implements Screen {
-	
-	public static float SPEED;
 	
 	public static final int PLAYER_PWIDTH = 232;
 	public static final int PLAYER_PHEIGHT = 326;
@@ -35,11 +33,11 @@ public class GameScreen implements Screen {
 
 	private static final int SHOOT_BUTTOM_PWIDTH = 256;
 	private static final int SHOOT_BUTTOM_PHEIGHT= 256;
-	private static final float SHOOT_BUTTON_SCALE = 0.875f;
+	private static final float SHOOT_BUTTON_SCALE = 0.75f;
 
 	private static final int STAT_BUTTOM_PWIDTH = 256;
 	private static final int STAT_BUTTOM_PHEIGHT= 256;
-	private static final float STAT_BUTTON_SCALE = 0.4375f;
+	private static final float STAT_BUTTON_SCALE = 0.375f;
 
 	private static final float GAMEPAUSE_WIDTH = GAMEPAUSE_PWIDTH * GAMEPAUSE_SCALE;
 	private static final float GAMEPAUSE_HEIGHT = GAMEPAUSE_PHEIGHT * GAMEPAUSE_SCALE;
@@ -71,44 +69,44 @@ public class GameScreen implements Screen {
 	private static final float UP_X = MOVE_BUTTON_WIDTH;
 	private static final float UP_Y = MOVE_BUTTON_HEIGHT * 1.5f;
 
+	public static final float MIN_FIREBALL_SPAWN_TIME = 0.3f;
+	public static final float MAX_FIREBALL_SPAWN_TIME = 1.5f;
 
-	public static final float SHOOT_COOLDOWN = 1.1f;
-	public static final float MIN_FIREBALL_SPAWN_TIME = 0.4f;
-	public static final float MAX_FIREBALL_SPAWN_TIME = 1.2f;
-
+	GameControl game;
+	Random random;
+	
 	Animation<?>[] rolls;
 	Texture x_line, y_line, gamepause, shoot_button, move_button, stat_button;
 	Texture blank;
-	
-	float x;
-	float y;
-	private int roll;
-	float stateTime;
-	float shootTimer;
-	float fireballsSpawnTimer;
-	private static float PLAYER_ANIMATION_SPEED = 0.2f;
-	
-	Random random;
-	
-	public static int PLAYER_DIRECTION;
-	float health = 1; // 1 - full health; 0 - dead
-	boolean dead = false;
-	float stat_bar_width;
-	CollisionRect player_rect;
-	
-	GameControl game;
-	
 	ArrayList<Bullet> bullets;
 	ArrayList<Fireball> fireballs;
 	ArrayList<Explosion> explosions;
 	
+	private float x, y;
+	private float speed, affected_speed;
+	private int PLAYER_DIRECTION;
+	private float health = 1; // 1 - full health; 0 - dead
+	private float stat_bar_width;
+	private CollisionRect player_rect;
+	private float shootTimer;
+	private float shoot_cooldown = 0.75f;
+	private int game_score = 0;
+	private float fireballsSpawnTimer;
+	
+	private float PLAYER_ANIMATION_SPEED = 0.2f;
+	private int roll;
+	float stateTime;
+	
 	BitmapFont gameFont;
+	GlyphLayout gamespeed, fps_text, xtracker, ytracker, game_score_text, health_text, advantage_text;
+	String advantage = "";
 	private float FONT_SCALE = 0.09f;
-	GlyphLayout gamespeed, fps, xtracker, ytracker;
+	
+	private DesktopControl desktop_control;
 	
 	public GameScreen(GameControl game) {
 		this.game = game;
-		SPEED = 240 * GameControl.GAMESPEED;
+		speed = 275;
 		x = (Gdx.graphics.getWidth() - PLAYER_WIDTH) / 2;
 		y = 0;
 		PLAYER_DIRECTION = 1;
@@ -140,6 +138,7 @@ public class GameScreen implements Screen {
 		
 		gameFont = new BitmapFont(Gdx.files.internal("fonts/menu_s.fnt"));
 		gameFont.getData().setScale(FONT_SCALE);
+	
 	}
 	
 	@Override
@@ -151,72 +150,88 @@ public class GameScreen implements Screen {
 	public void render(float delta) {
 		Gdx.gl.glClearColor(0.412f, 0.604f, 0.949f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		affected_speed = speed * GameControl.GAMESPEED;
+		desktop_control = new DesktopControl(affected_speed, x, y, PLAYER_DIRECTION, GameControl.SHOW_STAT);
+		
 		gamespeed = new GlyphLayout(gameFont, "Скорость x" + GameControl.GAMESPEED);
-		fps = new GlyphLayout(gameFont, "FPS: " + Gdx.graphics.getFramesPerSecond());
+		fps_text = new GlyphLayout(gameFont, "FPS: " + Gdx.graphics.getFramesPerSecond());
 		xtracker = new GlyphLayout(gameFont, "X: " + (int)x);
 		ytracker = new GlyphLayout(gameFont, "Y: " + (int)y);
+		game_score_text = new GlyphLayout(gameFont, "Попаданий: " + game_score);
+		advantage_text = new GlyphLayout(gameFont, " " + advantage);
+		health_text = new GlyphLayout(gameFont, "Здоровье: " + (int)(health * 100) + "%");
 		
 		stat_bar_width = PLAYER_WIDTH * 0.8f;
 		
-		SPEED = 240 * GameControl.GAMESPEED;
+		//Desktop movement code
+		desktop_control.movement(delta);
+		x = desktop_control.GetX();
+		y = desktop_control.GetY();
+		PLAYER_DIRECTION = desktop_control.GetPlayer_direction();
+		desktop_control.other();
+		GameControl.SHOW_STAT = desktop_control.GetShow_stat();
 		
-		//Movement code
-		if (Gdx.input.isKeyPressed(Keys.W) && Gdx.input.isKeyPressed(Keys.D)) {
-			x += SPEED * delta;
-			y += SPEED * delta;
-			PLAYER_DIRECTION = 1;
-		}
-		if (Gdx.input.isKeyPressed(Keys.W) && Gdx.input.isKeyPressed(Keys.A)) {
-			x -= SPEED * delta;
-			y += SPEED * delta;
-			PLAYER_DIRECTION = -1;
-		}
-		else if (Gdx.input.isKeyPressed(Keys.S) && Gdx.input.isKeyPressed(Keys.D)) {
-			x += SPEED * delta;
-			y -= SPEED * delta;
-			PLAYER_DIRECTION = 1;
-		}
-
-		else if (Gdx.input.isKeyPressed(Keys.S) && Gdx.input.isKeyPressed(Keys.A)) {
-			x -= SPEED * delta;
-			y -= SPEED * delta;
-			PLAYER_DIRECTION = -1;
-		}
-	//Android movement code
-		//Left
+		//Android movement code
+			//Left
 		if (Gdx.input.getX() >= LEFT_X && Gdx.input.getX() < LEFT_X + MOVE_BUTTON_WIDTH && Gdx.graphics.getHeight() - Gdx.input.getY() >= LEFT_Y &&
 				Gdx.graphics.getHeight() - Gdx.input.getY() < LEFT_Y + MOVE_BUTTON_HEIGHT && Gdx.input.isTouched()) {
-			x -= SPEED * delta;
+			x -= affected_speed * delta;
 			PLAYER_DIRECTION = -1;
 		}
-		//Down
+			//Down
 		if (Gdx.input.getX() >= DOWN_X && Gdx.input.getX() < DOWN_X + MOVE_BUTTON_WIDTH && Gdx.graphics.getHeight() - Gdx.input.getY() >= DOWN_Y &&
 				Gdx.graphics.getHeight() - Gdx.input.getY() < DOWN_Y + MOVE_BUTTON_HEIGHT && Gdx.input.isTouched()) {
-			y -= SPEED * delta;
+			y -= affected_speed * delta;
 		}
-		//Right
+			//Right
 		if (Gdx.input.getX() >= RIGHT_X && Gdx.input.getX() < RIGHT_X + MOVE_BUTTON_WIDTH && Gdx.graphics.getHeight() - Gdx.input.getY() >= RIGHT_Y &&
 				Gdx.graphics.getHeight() - Gdx.input.getY() < RIGHT_Y + MOVE_BUTTON_HEIGHT && Gdx.input.isTouched()) {
-			x += SPEED * delta;
+			x += affected_speed * delta;
 			PLAYER_DIRECTION = 1;
 		}
-		//Up
+			//Up
 		if (Gdx.input.getX() >= UP_X && Gdx.input.getX() < UP_X + MOVE_BUTTON_WIDTH && Gdx.graphics.getHeight() - Gdx.input.getY() >= UP_Y &&
 				Gdx.graphics.getHeight() - Gdx.input.getY() < UP_Y + MOVE_BUTTON_HEIGHT && Gdx.input.isTouched()) {
-			y += SPEED * delta;
+			y += affected_speed * delta;
 		}
-	// Ground limitation
-	if (y < 0) {
-		y = 0;
-	}
-	//Update player collision rect
-	player_rect.move(x, y);
+		
+		// Ground limitation
+		if (y < 0) {
+			y = 0;
+		}
+		if (y > Gdx.graphics.getHeight() - PLAYER_HEIGHT) {
+			y = Gdx.graphics.getHeight() - PLAYER_HEIGHT;
+		}
+		if (x < 0) {
+			x = 0;
+		}
+		if (x > Gdx.graphics.getWidth() - PLAYER_WIDTH) {
+			x = Gdx.graphics.getWidth() - PLAYER_WIDTH;
+		}
+		//Score actions
+		if (game_score >= 15 && game_score < 30) {
+			speed = 300;
+			advantage = "| Скорость + 25";
+		}
+		else if (game_score >= 30 && game_score < 45) {
+			speed = 350;
+			shoot_cooldown = 0.5f;
+			advantage = "| Скорость + 75, Время перезарядки - 0.25 сек";
+		}
+		else if (game_score >= 45) {
+			speed = 375;
+			shoot_cooldown = 0.25f;
+			advantage = "| Скорость + 100, Время перезарядки - 0.5 сек";
+		}
+		
+		//Update player collision rect
+		player_rect.move(x, y);
 		
 		//Rockets spawn/control code
 		shootTimer += delta;
 		if (Gdx.input.getX() >= SHOOT_BUTTON_X && Gdx.input.getX() <= SHOOT_BUTTON_X + SHOOT_BUTTON_WIDTH && Gdx.graphics.getHeight() - Gdx.input.getY() >= SHOOT_BUTTON_Y &&
 				Gdx.graphics.getHeight() - Gdx.input.getY() <= SHOOT_BUTTON_Y + SHOOT_BUTTON_HEIGHT) {
-			if (Gdx.input.justTouched() && shootTimer >= SHOOT_COOLDOWN) {
+			if (Gdx.input.justTouched() && shootTimer >= shoot_cooldown) {
 				shootTimer = 0;
 				if (PLAYER_DIRECTION == 1) {
 					bullets.add(new Bullet(x + PLAYER_WIDTH, y + PLAYER_HEIGHT / 4 - Bullet.HEIGHT / 2, PLAYER_DIRECTION));
@@ -257,6 +272,7 @@ public class GameScreen implements Screen {
 					fireballs_to_remove.add(fireball);
 					bullets_to_remove.add(bullet);
 					explosions.add(new Explosion(bullet.x, fireball.x, Bullet.WIDTH, Fireball.WIDTH, bullet.y, fireball.y, Bullet.HEIGHT, Fireball.HEIGHT, 0.5f));
+					game_score += 1;
 				}
 			}
 		}
@@ -265,7 +281,11 @@ public class GameScreen implements Screen {
 					if (fireball.getCollisionRect().CollidesWith(player_rect)) {
 						fireballs_to_remove.add(fireball);
 						if (health > 0) {
-							health -= 0.05f;
+							health -= 0.1f;
+						}
+						else {
+							game.setScreen(new GameOverScreen(game, game_score));
+							this.dispose();
 						}
 						explosions.add(new Explosion(x, fireball.x, PLAYER_WIDTH, Fireball.WIDTH, y, fireball.y, PLAYER_HEIGHT, Fireball.HEIGHT, 0.25f));
 				}
@@ -288,12 +308,7 @@ public class GameScreen implements Screen {
 		//Statistics output
 		if (Gdx.input.getX() >= STAT_BUTTON_X && Gdx.input.getX() < STAT_BUTTON_X + STAT_BUTTON_WIDTH && Gdx.graphics.getHeight() - Gdx.input.getY() >= STAT_BUTTON_Y &&
 				Gdx.graphics.getHeight() - Gdx.input.getY() < STAT_BUTTON_Y + STAT_BUTTON_HEIGHT && Gdx.input.justTouched()) {
-			GameControl.XY_TRACKING = !GameControl.XY_TRACKING;
 			GameControl.SHOW_STAT = !GameControl.SHOW_STAT;
-		}
-	
-		if (health <= 0) {
-			dead = true;
 		}
 		
 		stateTime += delta;
@@ -372,7 +387,7 @@ public class GameScreen implements Screen {
 		game.batch.draw(stat_button, STAT_BUTTON_X, STAT_BUTTON_Y, STAT_BUTTON_WIDTH, STAT_BUTTON_HEIGHT);
 			//Shoot button
 		game.batch.draw(shoot_button, SHOOT_BUTTON_X, SHOOT_BUTTON_Y, SHOOT_BUTTON_WIDTH, SHOOT_BUTTON_HEIGHT);
-			//Android movement buttons
+			//Draw android movement buttons
                 //Left
 		game.batch.draw(move_button, LEFT_X, LEFT_Y, MOVE_BUTTON_WIDTH / 2, MOVE_BUTTON_HEIGHT / 2, MOVE_BUTTON_WIDTH, MOVE_BUTTON_HEIGHT, 1, 1, 180, 0, 0, MOVE_BUTTOM_PWIDTH, MOVE_BUTTOM_PHEIGHT, false, false);
 		        //Down
@@ -383,7 +398,7 @@ public class GameScreen implements Screen {
         game.batch.draw(move_button, UP_X, UP_Y, MOVE_BUTTON_WIDTH / 2, MOVE_BUTTON_HEIGHT / 2, MOVE_BUTTON_WIDTH, MOVE_BUTTON_HEIGHT, 1, 1, 90, 0, 0, MOVE_BUTTOM_PWIDTH, MOVE_BUTTOM_PHEIGHT, false, false);
 
         //Draw  X and Y tracking
-		if (GameControl.XY_TRACKING) {
+		if (GameControl.SHOW_STAT) {
 			game.batch.draw(x_line, x, y, 1, PLAYER_HEIGHT);
 			game.batch.draw(y_line, x, y, PLAYER_WIDTH, 1);
 			game.batch.draw(x_line, x + PLAYER_WIDTH, y, 1, PLAYER_HEIGHT);
@@ -421,16 +436,27 @@ public class GameScreen implements Screen {
 			game.batch.draw(y_line, STAT_BUTTON_X, STAT_BUTTON_Y + STAT_BUTTON_HEIGHT, STAT_BUTTON_WIDTH, 1);
 			game.batch.draw(x_line, STAT_BUTTON_X, STAT_BUTTON_Y, 1, STAT_BUTTON_HEIGHT);
 			game.batch.draw(x_line, STAT_BUTTON_X + STAT_BUTTON_WIDTH, STAT_BUTTON_Y, 1, STAT_BUTTON_HEIGHT);
-		}
 
-		//Draw statistics
+			game.batch.draw(y_line, GAMEPAUSE_X, GAMEPAUSE_Y, GAMEPAUSE_WIDTH, 1);
+			game.batch.draw(y_line, GAMEPAUSE_X, GAMEPAUSE_Y + GAMEPAUSE_HEIGHT, GAMEPAUSE_WIDTH, 1);
+			game.batch.draw(x_line, GAMEPAUSE_X, GAMEPAUSE_Y, 1, GAMEPAUSE_HEIGHT);
+			game.batch.draw(x_line, GAMEPAUSE_X + GAMEPAUSE_WIDTH, GAMEPAUSE_Y, 1, GAMEPAUSE_HEIGHT);
+		}
+		//Draw font
+			//Draw statistics
 		if (GameControl.SHOW_STAT) {
-			game.batch.setColor(Color.GOLD);
 			gameFont.draw(game.batch, gamespeed, 0, Gdx.graphics.getHeight() * 0.97f + gamespeed.height);
-			gameFont.draw(game.batch, fps, 0, Gdx.graphics.getHeight() * 0.94f + fps.height);
+			gameFont.draw(game.batch, fps_text, 0, Gdx.graphics.getHeight() * 0.94f + fps_text.height);
 			gameFont.draw(game.batch, xtracker, 0, Gdx.graphics.getHeight() * 0.91f + xtracker.height);
 			gameFont.draw(game.batch, ytracker, 0, Gdx.graphics.getHeight() * 0.88f + ytracker.height);
-			game.batch.setColor(Color.WHITE);
+			gameFont.draw(game.batch, health_text, 0, Gdx.graphics.getHeight() * 0.82f + health_text.height);
+			gameFont.draw(game.batch, game_score_text, 0, Gdx.graphics.getHeight() * 0.85f + game_score_text.height);
+			gameFont.draw(game.batch, advantage_text, game_score_text.width, Gdx.graphics.getHeight() * 0.85f + game_score_text.height);
+		}
+		else {
+			//Draw score
+		gameFont.draw(game.batch, game_score_text, 0, Gdx.graphics.getHeight() * 0.97f + game_score_text.height);
+		gameFont.draw(game.batch, advantage_text, game_score_text.width, Gdx.graphics.getHeight() * 0.97f + game_score_text.height);
 		}
 		game.batch.end();
 		

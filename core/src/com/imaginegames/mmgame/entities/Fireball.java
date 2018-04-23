@@ -15,11 +15,11 @@ public class Fireball {
 	private static Animation<?> ANIMATION;
 	private static final int PWIDTH = 128;
 	private static final int PHEIGHT = 128;
-	private static final float SCALE = 0.8f;
+	private static final float SCALE = 0.625f;
 	private final float FIREBALL_X = Gdx.graphics.getWidth();
 	public static final float WIDTH = PWIDTH * SCALE;
 	public static final float HEIGHT = PHEIGHT * SCALE;
-	private static final float ANIMATION_SPEED = 0.04f;
+	private static final float ANIMATION_SPEED = 0.03f;
 	public float x, y; // Don't do variable a static if it have a many objects with their own parameters for this variable
 	
 	public boolean remove = false;
