@@ -21,9 +21,9 @@ import com.imaginegames.mmgame.attachable.DesktopControl;;
 
 public class GameScreen implements Screen {
 	
-	public static final int PLAYER_PWIDTH = 232;
-	public static final int PLAYER_PHEIGHT = 326;
-	public static final float PLAYER_SCALE = 0.5f;
+	public static final int PLAYER_PWIDTH = 32;
+	public static final int PLAYER_PHEIGHT = 145;
+	public static final float PLAYER_SCALE = 1f;
 	public static final float PLAYER_WIDTH = PLAYER_PWIDTH * PLAYER_SCALE;
 	public static final float PLAYER_HEIGHT = PLAYER_PHEIGHT * PLAYER_SCALE;
 	
@@ -128,7 +128,7 @@ public class GameScreen implements Screen {
 		
 		roll = 0;
 		rolls = new Animation[3];
-		TextureRegion[][] player_animated_sheet = TextureRegion.split(new Texture("player_sheet.png"), PLAYER_PWIDTH, PLAYER_PHEIGHT);
+		TextureRegion[][] player_animated_sheet = TextureRegion.split(new Texture("player_normal_sheet.png"), PLAYER_PWIDTH, PLAYER_PHEIGHT);
 		rolls[0] = new Animation<>(PLAYER_ANIMATION_SPEED, player_animated_sheet[0]);
 		
 		bullets = new ArrayList<Bullet>();
@@ -209,16 +209,16 @@ public class GameScreen implements Screen {
 			x = Gdx.graphics.getWidth() - PLAYER_WIDTH;
 		}
 		//Score actions
-		if (game_score >= 15 && game_score < 30) {
+		if (game_score >= 10 && game_score < 20) {
 			speed = 300;
 			advantage = "| Скорость + 25";
 		}
-		else if (game_score >= 30 && game_score < 45) {
+		else if (game_score >= 20 && game_score < 30) {
 			speed = 350;
 			shoot_cooldown = 0.5f;
 			advantage = "| Скорость + 75, Время перезарядки - 0.25 сек";
 		}
-		else if (game_score >= 45) {
+		else if (game_score >= 30) {
 			speed = 375;
 			shoot_cooldown = 0.25f;
 			advantage = "| Скорость + 100, Время перезарядки - 0.5 сек";
@@ -227,16 +227,16 @@ public class GameScreen implements Screen {
 		//Update player collision rect
 		player_rect.move(x, y);
 		
-		//Rockets spawn/control code
+		//Bullets spawn/control code
 		shootTimer += delta;
 		if (Gdx.input.getX() >= SHOOT_BUTTON_X && Gdx.input.getX() <= SHOOT_BUTTON_X + SHOOT_BUTTON_WIDTH && Gdx.graphics.getHeight() - Gdx.input.getY() >= SHOOT_BUTTON_Y &&
 				Gdx.graphics.getHeight() - Gdx.input.getY() <= SHOOT_BUTTON_Y + SHOOT_BUTTON_HEIGHT) {
 			if (Gdx.input.justTouched() && shootTimer >= shoot_cooldown) {
 				shootTimer = 0;
 				if (PLAYER_DIRECTION == 1) {
-					bullets.add(new Bullet(x + PLAYER_WIDTH, y + PLAYER_HEIGHT / 4 - Bullet.HEIGHT / 2, PLAYER_DIRECTION));
+					bullets.add(new Bullet(x + PLAYER_WIDTH, y + PLAYER_HEIGHT * 0.6f - Bullet.HEIGHT / 2, PLAYER_DIRECTION));
 				} else if (PLAYER_DIRECTION == -1) {
-					bullets.add(new Bullet(x - Bullet.WIDTH, y + PLAYER_HEIGHT / 4 - Bullet.HEIGHT / 2, PLAYER_DIRECTION));
+					bullets.add(new Bullet(x - Bullet.WIDTH, y + PLAYER_HEIGHT * 0.6f - Bullet.HEIGHT / 2, PLAYER_DIRECTION));
 				}
 			}
 		}
@@ -256,7 +256,7 @@ public class GameScreen implements Screen {
 			}
 		}
 		
-		//Rockets update
+		//Bullets update
 		ArrayList<Bullet> bullets_to_remove = new ArrayList<Bullet>();
 		for (Bullet bullet : bullets) {
 			bullet.update(delta);
@@ -265,13 +265,13 @@ public class GameScreen implements Screen {
 			}
 		}
 			
-		// Check for collisions (fireballs & bullets)
-		for (Bullet bullet : bullets) {
+		//Check for collisions (fireballs & bullets)
+		for (Bullet rocket : bullets) {
 			for (Fireball fireball : fireballs) {
-				if (bullet.getCollisionRect().CollidesWith(fireball.getCollisionRect())) {
+				if (rocket.getCollisionRect().CollidesWith(fireball.getCollisionRect())) {
 					fireballs_to_remove.add(fireball);
-					bullets_to_remove.add(bullet);
-					explosions.add(new Explosion(bullet.x, fireball.x, Bullet.WIDTH, Fireball.WIDTH, bullet.y, fireball.y, Bullet.HEIGHT, Fireball.HEIGHT, 0.5f));
+					bullets_to_remove.add(rocket);
+					explosions.add(new Explosion(rocket.x, fireball.x, Bullet.WIDTH, Fireball.WIDTH, rocket.y, fireball.y, Bullet.HEIGHT, Fireball.HEIGHT, 0.5f));
 					game_score += 1;
 				}
 			}
@@ -315,8 +315,8 @@ public class GameScreen implements Screen {
 		TextureRegion currentFrame = (TextureRegion)rolls[roll].getKeyFrame(stateTime, true);
 		
 		game.batch.begin();
-		for (Bullet bullet : bullets) {
-			bullet.render(game.batch, delta);
+		for (Bullet rocket : bullets) {
+			rocket.render(game.batch, delta);
 		}
 		
 		for (Fireball fireball : fireballs) {

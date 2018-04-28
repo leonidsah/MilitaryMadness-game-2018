@@ -38,7 +38,7 @@ public class SettingsMenuScreen implements Screen {
 
 	public SettingsMenuScreen(GameControl game) {
 		this.game = game;	
-		decoration_fireball_sheet = TextureRegion.split(new Texture("fireball_sheet.png"), DECOR_FIREBALL_PWIDTH, DECOR_FIREBALL_PHEIGHT);
+		decoration_fireball_sheet = TextureRegion.split(new Texture("hexagonal_sheet.png"), DECOR_FIREBALL_PWIDTH, DECOR_FIREBALL_PHEIGHT);
 		decoration_fireball = new Animation<>(DECOR_FIREBALL_ANIMATION_SPEED / GameControl.GAMESPEED, decoration_fireball_sheet[0]);
 		
 		font = new BitmapFont(Gdx.files.internal("fonts/menu_s.fnt"));

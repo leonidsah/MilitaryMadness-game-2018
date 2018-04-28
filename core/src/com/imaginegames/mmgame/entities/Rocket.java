@@ -2,36 +2,49 @@ package com.imaginegames.mmgame.entities;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.imaginegames.mmgame.GameControl;
 import com.imaginegames.mmgame.tools.CollisionRect;
 
-public class Bullet {
+public class Rocket {
 	
-	public static float SPEED = 1500;
+	public static float SPEED = 900;
 	
-	private static final float SCALE = 1f;
-	public static final float WIDTH = 16 * SCALE;
-	public static final float HEIGHT = 8 * SCALE;
+	private static Animation<?> rocket_ANIMATION;
+	private static final int PWIDTH = 74;
+	private static final int PHEIGHT = 31;
+	private static final float SCALE = 1.2f;
+	public static final float WIDTH = 74 * SCALE;
+	public static final float HEIGHT = 31 * SCALE;
+	private static final float ANIMATION_SPEED = 0.15f;
 	public float x, y; // Don't do variable a static if it have a many objects with their own parameters for this variable
 	int speed_direction;
 	
-	Texture x_line, y_line, rocket;
-	private CollisionRect bullet_rect;
+	Texture x_line;
+	Texture y_line;
+	private CollisionRect rocket_rect;
 	
-	public boolean remove = false;;
+	public boolean remove = false;
 	
-	public Bullet (float x, float y, int speed_direction) {
+	private float stateTime;
+	private int roll;
+	
+	public Rocket (float x, float y, int speed_direction) {
 		SPEED = SPEED * GameControl.GAMESPEED;
 		this.x = x;
 		this.y = y;
-		
 		x_line = new Texture("x_line.png");
 		y_line = new Texture("y_line.png");
-		rocket = new Texture("bullet.png");
-		
 		this.speed_direction = speed_direction;
-		bullet_rect = new CollisionRect(x, y, WIDTH, HEIGHT);
+		roll = 1; // max = 2
+		TextureRegion[][] rocket_animated_sheet = TextureRegion.split(new Texture("rocket_sheet.png"), PWIDTH, PHEIGHT);
+		
+		if (rocket_ANIMATION == null) {
+			rocket_ANIMATION = new Animation<>(ANIMATION_SPEED, rocket_animated_sheet[roll]);
+			}
+		rocket_rect = new CollisionRect(x, y, WIDTH, HEIGHT);
 		
 		}
 	public void update(float deltaTime) {
@@ -39,11 +52,11 @@ public class Bullet {
 		if (y > Gdx.graphics.getHeight() || y < 0 - HEIGHT || x < 0 - WIDTH || x > Gdx.graphics.getWidth()) {
 			remove = true;
 		}
-		bullet_rect.move(x, y);
+		rocket_rect.move(x, y);
 	}
 	public void render(SpriteBatch batch, float delta) {
 		if (speed_direction == 1) {
-			batch.draw(rocket, x, y, WIDTH, HEIGHT);
+			batch.draw((TextureRegion) rocket_ANIMATION.getKeyFrame(stateTime, true), x, y, WIDTH, HEIGHT);
 			if (GameControl.SHOW_STAT) {
 			batch.draw(x_line, x + WIDTH, y, 1, HEIGHT);
 			batch.draw(x_line, x, y, 1, HEIGHT);
@@ -52,7 +65,7 @@ public class Bullet {
 			}
 		}
 		else if (speed_direction == -1) {
-			batch.draw(rocket, x + WIDTH, y, -WIDTH, HEIGHT);
+			batch.draw((TextureRegion) rocket_ANIMATION.getKeyFrame(stateTime, true), x + WIDTH, y, -WIDTH, HEIGHT);
 			if (GameControl.SHOW_STAT) {
 			batch.draw(x_line, x, y, 1, HEIGHT);
 			batch.draw(x_line, x + WIDTH, y, 1, HEIGHT);
@@ -61,10 +74,11 @@ public class Bullet {
 			}
 			
 		}
+		stateTime += delta;
 	}
 	
 	public CollisionRect getCollisionRect() {
-		return bullet_rect;
+		return rocket_rect;
 	}
 
 }

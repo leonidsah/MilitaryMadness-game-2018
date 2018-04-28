@@ -14,7 +14,8 @@ public class GameControl extends Game {
 	public static final int HEIGHT = 860;
 	
 	public static final String GENERATION = "Alpha"; 
-	public static final String RELEASE = "0.4.1.2"; //0.4.1 Android release + new textures
+	public static final String RELEASE = "0.4.1.4"; //0.4.1 Android release + new textures 0.4.1.3 - new texture for player and touch buttons, now events hidden in t/0.4.1.4 - bullets added compare with rockets
+	// 0.4.2 - Optimization update: needed assetmanager/new buttons
 	public static final String WELCOME_TITLE = ">>> Работа над 0.4.2 <<<";
 	public static final String VERSION = GENERATION + " " + RELEASE + ": " + WELCOME_TITLE;
 	
@@ -41,7 +42,7 @@ public class GameControl extends Game {
 
 	@Override
 	public void render() {
-		batch.setProjectionMatrix(cam.combined);
+		//batch.setProjectionMatrix(cam.combined);
 		super.render();
 	}
 	
