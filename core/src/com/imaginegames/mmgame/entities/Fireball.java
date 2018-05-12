@@ -9,6 +9,8 @@ import com.imaginegames.mmgame.GameControl;
 import com.imaginegames.mmgame.tools.CollisionRect;
 
 public class Fireball {
+
+	private GameControl game;
 	
 	public static float SPEED;
 	
@@ -28,12 +30,13 @@ public class Fireball {
 	
 	private CollisionRect fireball_rect;
 	
-	public Fireball (float y) {
-		SPEED = 560 * GameControl.GAMESPEED;
+	public Fireball (GameControl game, float y) {
+		this.game = game;
 		this.x = FIREBALL_X;
 		this.y = y;
+		SPEED = 560 * GameControl.GAMESPEED;
 		fireball_rect = new CollisionRect(x, y, WIDTH, HEIGHT);
-		TextureRegion[][] fireball_animated_sheet = TextureRegion.split(new Texture("fireball_sheet.png"), PWIDTH, PHEIGHT);
+		TextureRegion[][] fireball_animated_sheet = TextureRegion.split(game.assetManager.get("fireball_sheet.png", Texture.class), PWIDTH, PHEIGHT);
 		if (ANIMATION == null) {
 			ANIMATION = new Animation<>(ANIMATION_SPEED, fireball_animated_sheet[0]);
 			}

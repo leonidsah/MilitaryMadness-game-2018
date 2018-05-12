@@ -9,6 +9,8 @@ import com.imaginegames.mmgame.GameControl;
 import com.imaginegames.mmgame.tools.CollisionRect;
 
 public class Rocket {
+
+	private GameControl game;
 	
 	public static float SPEED = 900;
 	
@@ -31,15 +33,16 @@ public class Rocket {
 	private float stateTime;
 	private int roll;
 	
-	public Rocket (float x, float y, int speed_direction) {
-		SPEED = SPEED * GameControl.GAMESPEED;
+	public Rocket (GameControl game, float x, float y, int speed_direction) {
+		this.game = game;
 		this.x = x;
 		this.y = y;
-		x_line = new Texture("x_line.png");
-		y_line = new Texture("y_line.png");
+		SPEED = SPEED * GameControl.GAMESPEED;
+		x_line = game.assetManager.get("x_line.png", Texture.class);
+		y_line = game.assetManager.get("y_line.png", Texture.class);
 		this.speed_direction = speed_direction;
 		roll = 1; // max = 2
-		TextureRegion[][] rocket_animated_sheet = TextureRegion.split(new Texture("rocket_sheet.png"), PWIDTH, PHEIGHT);
+		TextureRegion[][] rocket_animated_sheet = TextureRegion.split(game.assetManager.get("rocket_sheet.png", Texture.class), PWIDTH, PHEIGHT);
 		
 		if (rocket_ANIMATION == null) {
 			rocket_ANIMATION = new Animation<>(ANIMATION_SPEED, rocket_animated_sheet[roll]);

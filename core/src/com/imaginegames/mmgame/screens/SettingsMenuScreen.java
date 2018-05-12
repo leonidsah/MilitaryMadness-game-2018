@@ -10,14 +10,11 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.imaginegames.mmgame.GameControl;
+import com.imaginegames.mmgame.attachable.ScreenButton;
 
 public class SettingsMenuScreen implements Screen {
 		
-	private static float LANGUAGE_Y;
-	private static float XY_Y;
-	private static float GAMESPEED_Y;
-	private static float BACK_Y;
-	private static float FULLSCREEN_Y;
+	private static float language_y, xy_y, gamespeed_y, back_y, fullscreen_y, undead_y;
 	private static final int DECOR_FIREBALL_PWIDTH = 128;
 	private static final int DECOR_FIREBALL_PHEIGHT = 128;
 	private static final float DECOR_FIREBALL_SCALE = 1f;
@@ -27,31 +24,27 @@ public class SettingsMenuScreen implements Screen {
 	
 	private float stateTime;
 		
-	GameControl game;
+	private GameControl game;
+	private float button_x = MainMenuScreen.BUTTON_X;
+
+	private Animation<?> decoration_fireball;
+	private TextureRegion[][] decoration_fireball_sheet;
 	
-	Animation<?> decoration_fireball;
-	TextureRegion[][] decoration_fireball_sheet;
-	
-	BitmapFont font, font_s, font_c, font_u;
-	private float FONT_SCALE = 0.15f;
-	GlyphLayout gamespeed, gamespeed_s, back, back_s, xy, xy_s, language, language_s, on, off, russian, english, gamespeed_c, fullscreen, fullscreen_s, unavailable;
+	private BitmapFont font, font_s, font_c;
+	private GlyphLayout gamespeed, gamespeed_s, back, back_s, xy, xy_s, language, language_s, on, off, russian, english,
+			gamespeed_c, fullscreen, fullscreen_s, unavailable, undead, undead_s;
+
+	private ScreenButton back_button, language_button, xy_button, gamespeed_button, fullscreen_button, undead_button;
 
 	public SettingsMenuScreen(GameControl game) {
-		this.game = game;	
-		decoration_fireball_sheet = TextureRegion.split(new Texture("hexagonal_sheet.png"), DECOR_FIREBALL_PWIDTH, DECOR_FIREBALL_PHEIGHT);
+		this.game = game;
+		decoration_fireball_sheet = TextureRegion.split(game.assetManager.get("hexagonal_sheet.png", Texture.class), DECOR_FIREBALL_PWIDTH, DECOR_FIREBALL_PHEIGHT);
 		decoration_fireball = new Animation<>(DECOR_FIREBALL_ANIMATION_SPEED / GameControl.GAMESPEED, decoration_fireball_sheet[0]);
-		
-		font = new BitmapFont(Gdx.files.internal("fonts/menu_s.fnt"));
-		font_s = new BitmapFont(Gdx.files.internal("fonts/menu.fnt"));
-		font_c = new BitmapFont(Gdx.files.internal("fonts/menu.fnt"));
-		font_u = new BitmapFont(Gdx.files.internal("fonts/menu.fnt"));
-		font.getData().setScale(FONT_SCALE);
-		font_s.getData().setScale(FONT_SCALE);
-		font_c.getData().setScale(FONT_SCALE * 0.7f);
-		font_u.getData().setScale(FONT_SCALE * 0.7f);
-		font_c.setColor(Color.ROYAL);
-		font_u.setColor(Color.GRAY);
-		
+
+		font = game.assetManager.get("fonts/Play-Bold.ttf", BitmapFont.class);
+		font_s = game.assetManager.get("fonts/Play-Bold_S.ttf", BitmapFont.class);
+		font_c = game.assetManager.get("fonts/Play-Regular.ttf", BitmapFont.class);
+
 		language = new GlyphLayout(font, "Язык: ");
 		language_s = new GlyphLayout(font_s, "Язык: ");
 		xy = new GlyphLayout(font, "Отображение осей X и Y\n" + "для некоторых объектов: ");
@@ -62,18 +55,28 @@ public class SettingsMenuScreen implements Screen {
 		fullscreen_s = new GlyphLayout(font_s, "Полноэкранный режим: ");
 		on = new GlyphLayout(font_c, "Включено");
 		off = new GlyphLayout(font_c, "Отключено");
-		russian = new GlyphLayout(font_c, "Русский");
+		russian = new GlyphLayout(font_c, "Русcкий");
 		english = new GlyphLayout(font_c, "English");
 		gamespeed = new GlyphLayout(font, "Скорость игры: ");
 		gamespeed_s = new GlyphLayout(font_s, "Скорость игры: ");
 		gamespeed_c = new GlyphLayout(font_c, "x" + GameControl.GAMESPEED);
-		unavailable = new GlyphLayout(font_u, "-");
-		
-		LANGUAGE_Y = Gdx.graphics.getHeight() * 0.95f - language.height;
-		XY_Y = LANGUAGE_Y - Gdx.graphics.getHeight() * 0.06f - xy.height;
-		GAMESPEED_Y = XY_Y - Gdx.graphics.getHeight() * 0.06f - gamespeed.height;
-		FULLSCREEN_Y = GAMESPEED_Y - Gdx.graphics.getHeight() * 0.06f - fullscreen.height;
-		BACK_Y = Gdx.graphics.getHeight() * 0.05f;
+		unavailable = new GlyphLayout(font_c, "-");
+		undead = new GlyphLayout(font, "Бессмертие: ");
+		undead_s = new GlyphLayout(font_s, "Бессмертие: ");
+
+		back_y = Gdx.graphics.getHeight() * 0.05f;
+		language_y = Gdx.graphics.getHeight() * 0.95f - language.height;
+		xy_y = language_y - Gdx.graphics.getHeight() * 0.06f - xy.height;
+		gamespeed_y = xy_y - Gdx.graphics.getHeight() * 0.06f - gamespeed.height;
+		fullscreen_y = gamespeed_y - Gdx.graphics.getHeight() * 0.06f - fullscreen.height;
+		undead_y = fullscreen_y - Gdx.graphics.getHeight() * 0.06f - undead.height;
+
+		back_button = new ScreenButton(button_x, back_y, back.width, back.height);
+		language_button = new ScreenButton(button_x, language_y, language.width, language.height);
+		xy_button = new ScreenButton(button_x, xy_y, xy.width, xy.height);
+		gamespeed_button = new ScreenButton(button_x, gamespeed_y, gamespeed.width, gamespeed.height);
+		fullscreen_button = new ScreenButton(button_x, fullscreen_y, fullscreen.width, fullscreen.height);
+		undead_button = new ScreenButton(button_x, undead_y, undead.width, undead.height);
 	}
 
 	@Override
@@ -89,76 +92,90 @@ public class SettingsMenuScreen implements Screen {
 		
 		game.batch.begin();
 		game.batch.draw((TextureRegion) decoration_fireball.getKeyFrame(stateTime, true), Gdx.graphics.getWidth() - DECOR_FIREBALL_WIDTH, 0, DECOR_FIREBALL_WIDTH, DECOR_FIREBALL_HEIGHT);
-		font.draw(game.batch, gamespeed, MainMenuScreen.BUTTON_X, GAMESPEED_Y + gamespeed.height);
-		font.draw(game.batch, back, MainMenuScreen.BUTTON_X, BACK_Y + back.height);
-		font.draw(game.batch, language, MainMenuScreen.BUTTON_X, LANGUAGE_Y + language.height);
-		font.draw(game.batch, xy, MainMenuScreen.BUTTON_X, XY_Y + xy.height);
-		font.draw(game.batch, fullscreen, MainMenuScreen.BUTTON_X, FULLSCREEN_Y + fullscreen.height);
-		font_c.draw(game.batch, gamespeed_c, MainMenuScreen.BUTTON_X * 2 + gamespeed.width, GAMESPEED_Y + gamespeed.height * 0.75f);
+		font.draw(game.batch, gamespeed, MainMenuScreen.BUTTON_X, gamespeed_y + gamespeed.height);
+		font.draw(game.batch, back, MainMenuScreen.BUTTON_X, back_y + back.height);
+		font.draw(game.batch, language, MainMenuScreen.BUTTON_X, language_y + language.height);
+		font.draw(game.batch, xy, MainMenuScreen.BUTTON_X, xy_y + xy.height);
+		font.draw(game.batch, fullscreen, MainMenuScreen.BUTTON_X, fullscreen_y + fullscreen.height);
+		font.draw(game.batch, undead, MainMenuScreen.BUTTON_X, undead_y + undead.height);
+		font_c.draw(game.batch, gamespeed_c, MainMenuScreen.BUTTON_X * 2 + gamespeed.width, gamespeed_y + gamespeed.height * 0.75f);
 		
 		if (GameControl.SHOW_STAT) {
-			font_c.draw(game.batch, on, MainMenuScreen.BUTTON_X * 2 + xy.width, XY_Y + xy.height * 0.75f);
+			font_c.draw(game.batch, on, MainMenuScreen.BUTTON_X * 2 + xy.width, xy_y + xy.height * 0.75f);
 		}
 		else {
-			font_c.draw(game.batch, off, MainMenuScreen.BUTTON_X * 2 + xy.width, XY_Y + xy.height * 0.75f);
+			font_c.draw(game.batch, off, MainMenuScreen.BUTTON_X * 2 + xy.width, xy_y + xy.height * 0.75f);
+		}
+
+		if (GameControl.UNDEAD) {
+			font_c.draw(game.batch, on, MainMenuScreen.BUTTON_X * 2 + undead.width, undead_y + undead.height * 0.75f);
+		}
+		else {
+			font_c.draw(game.batch, off, MainMenuScreen.BUTTON_X * 2 + undead.width, undead_y + undead.height * 0.75f);
 		}
 		
 		if (!GameControl.ENGLISH_LANGUAGE) {
-		font_c.draw(game.batch, russian, MainMenuScreen.BUTTON_X * 2 + language.width, LANGUAGE_Y + language.height * 0.75f);
+		font_c.draw(game.batch, russian, MainMenuScreen.BUTTON_X * 2 + language.width, language_y + language.height * 0.75f);
 		}
 		else {
-		font_c.draw(game.batch, english, MainMenuScreen.BUTTON_X * 2 + language.width, LANGUAGE_Y + language.height * 0.75f);	
+		font_c.draw(game.batch, english, MainMenuScreen.BUTTON_X * 2 + language.width, language_y + language.height * 0.75f);
 		}
-		
-		if (GameControl.FULLSCREEN) {
-			font_u.draw(game.batch, unavailable, MainMenuScreen.BUTTON_X * 2 + fullscreen.width, FULLSCREEN_Y + fullscreen.height * 0.75f);
-		}
-		else {
-			font_u.draw(game.batch, unavailable, MainMenuScreen.BUTTON_X * 2 + fullscreen.width, FULLSCREEN_Y + fullscreen.height * 0.75f);
-		}
+
+		font_c.draw(game.batch, unavailable, MainMenuScreen.BUTTON_X * 2 + fullscreen.width, fullscreen_y + fullscreen.height * 0.75f);
+
 		//Back button
-		if (Gdx.input.getX() > MainMenuScreen.BUTTON_X && Gdx.input.getX() < MainMenuScreen.BUTTON_X + back.width && Gdx.graphics.getHeight() - Gdx.input.getY() > BACK_Y && Gdx.graphics.getHeight() - Gdx.input.getY() < BACK_Y + back.height) {
-			font_s.draw(game.batch, back_s, MainMenuScreen.BUTTON_X, BACK_Y + back.height);
-			if (Gdx.input.justTouched()) {
-				game.setScreen(new MainMenuScreen(game));
-				this.dispose();
-			}
+		if (back_button.isOnButton(0)) {
+			font_s.draw(game.batch, back_s, MainMenuScreen.BUTTON_X, back_y + back.height);
 		}
+		if (back_button.isReleasedButton(0)) {
+			game.setScreen(new MainMenuScreen(game));
+			this.dispose();
+		}
+
 		//Language
-		if (Gdx.input.getX() > MainMenuScreen.BUTTON_X && Gdx.input.getX() < MainMenuScreen.BUTTON_X + language.width && Gdx.graphics.getHeight() - Gdx.input.getY() > LANGUAGE_Y && Gdx.graphics.getHeight() - Gdx.input.getY() < LANGUAGE_Y + language.height) {
-			font_s.draw(game.batch, language_s, MainMenuScreen.BUTTON_X, LANGUAGE_Y + language.height);
-			if (Gdx.input.justTouched()) {
-				GameControl.ENGLISH_LANGUAGE = !GameControl.ENGLISH_LANGUAGE;
-			}
+		if (language_button.isOnButton(0)) {
+			font_s.draw(game.batch, language_s, MainMenuScreen.BUTTON_X, language_y + language.height);
 		}
+		if (language_button.isReleasedButton(0)) {
+			GameControl.ENGLISH_LANGUAGE = !GameControl.ENGLISH_LANGUAGE;
+		}
+
 		//Show stat
-		if (Gdx.input.getX() > MainMenuScreen.BUTTON_X && Gdx.input.getX() < MainMenuScreen.BUTTON_X + xy.width && Gdx.graphics.getHeight() - Gdx.input.getY() > XY_Y && Gdx.graphics.getHeight() - Gdx.input.getY() < XY_Y + xy.height) {
-			font_s.draw(game.batch, xy_s, MainMenuScreen.BUTTON_X, XY_Y + xy.height);
-			if (Gdx.input.justTouched()) {
-				GameControl.SHOW_STAT = !GameControl.SHOW_STAT;
+		if (xy_button.isOnButton(0)) {
+			font_s.draw(game.batch, xy_s, MainMenuScreen.BUTTON_X, xy_y + xy.height);
+		}
+		if (xy_button.isReleasedButton(0)) {
+			GameControl.SHOW_STAT = !GameControl.SHOW_STAT;
+		}
+
+		//Undead
+		if (undead_button.isOnButton(0)) {
+			font_s.draw(game.batch, undead_s, MainMenuScreen.BUTTON_X, undead_y + undead.height);
+		}
+		if (undead_button.isReleasedButton(0)) {
+			GameControl.UNDEAD = !GameControl.UNDEAD;
+		}
+		//Game speed
+		if (gamespeed_button.isOnButton(0)) {
+			font_s.draw(game.batch, gamespeed_s, MainMenuScreen.BUTTON_X, gamespeed_y + gamespeed.height);
+		}
+		if (gamespeed_button.isReleasedButton(0)) {
+			if (GameControl.GAMESPEED == 1.0f) {
+				GameControl.GAMESPEED = 0.5f;
+				gamespeed_c = new GlyphLayout(font_c, "x" + GameControl.GAMESPEED);
+			}
+			else if (GameControl.GAMESPEED == 0.5f) {
+				GameControl.GAMESPEED = 0.1f;
+				gamespeed_c = new GlyphLayout(font_c, "x" + GameControl.GAMESPEED);
+			}
+			else {
+				GameControl.GAMESPEED = 1.0f;
+				gamespeed_c = new GlyphLayout(font_c, "x" + GameControl.GAMESPEED);
 			}
 		}
-		
-		if (Gdx.input.getX() > MainMenuScreen.BUTTON_X && Gdx.input.getX() < MainMenuScreen.BUTTON_X + gamespeed.width && Gdx.graphics.getHeight() - Gdx.input.getY() > GAMESPEED_Y && Gdx.graphics.getHeight() - Gdx.input.getY() < GAMESPEED_Y + gamespeed.height) {
-			font_s.draw(game.batch, gamespeed_s, MainMenuScreen.BUTTON_X, GAMESPEED_Y + gamespeed.height);
-			if (Gdx.input.justTouched()) {
-					if (GameControl.GAMESPEED == 1.0f) {
-						GameControl.GAMESPEED = 0.5f;
-						gamespeed_c = new GlyphLayout(font_c, "x" + GameControl.GAMESPEED);
-					}
-					else if (GameControl.GAMESPEED == 0.5f) {
-						GameControl.GAMESPEED = 0.1f;
-						gamespeed_c = new GlyphLayout(font_c, "x" + GameControl.GAMESPEED);
-					}
-					else {
-						GameControl.GAMESPEED = 1.0f;
-						gamespeed_c = new GlyphLayout(font_c, "x" + GameControl.GAMESPEED);
-					}
-					decoration_fireball = new Animation<>(DECOR_FIREBALL_ANIMATION_SPEED / GameControl.GAMESPEED, decoration_fireball_sheet[0]);
-				}
-		}
-		if (Gdx.input.getX() > MainMenuScreen.BUTTON_X && Gdx.input.getX() < MainMenuScreen.BUTTON_X + fullscreen.width && Gdx.graphics.getHeight() - Gdx.input.getY() > FULLSCREEN_Y && Gdx.graphics.getHeight() - Gdx.input.getY() < FULLSCREEN_Y + fullscreen.height) {
-			font_s.draw(game.batch, fullscreen_s, MainMenuScreen.BUTTON_X,FULLSCREEN_Y + fullscreen.height);
+
+		if (Gdx.input.getX() > MainMenuScreen.BUTTON_X && Gdx.input.getX() < MainMenuScreen.BUTTON_X + fullscreen.width && Gdx.graphics.getHeight() - Gdx.input.getY() > fullscreen_y && Gdx.graphics.getHeight() - Gdx.input.getY() < fullscreen_y + fullscreen.height) {
+			font_s.draw(game.batch, fullscreen_s, MainMenuScreen.BUTTON_X,fullscreen_y + fullscreen.height);
 			if (Gdx.input.justTouched()) {
 				//Gdx.graphics.setFullscreenMode(null);
 				GameControl.FULLSCREEN = !GameControl.FULLSCREEN;

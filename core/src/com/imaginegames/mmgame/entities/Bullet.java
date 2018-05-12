@@ -1,5 +1,6 @@
 package com.imaginegames.mmgame.entities;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -15,20 +16,22 @@ public class Bullet {
 	public static final float HEIGHT = 8 * SCALE;
 	public float x, y; // Don't do variable a static if it have a many objects with their own parameters for this variable
 	int speed_direction;
-	
-	Texture x_line, y_line, rocket;
+
+	private GameControl game;
+	private Texture x_line, y_line, rocket;
 	private CollisionRect bullet_rect;
 	
 	public boolean remove = false;;
 	
-	public Bullet (float x, float y, int speed_direction) {
-		SPEED = SPEED * GameControl.GAMESPEED;
+	public Bullet (GameControl game, float x, float y, int speed_direction) {
+		this.game = game;
 		this.x = x;
 		this.y = y;
+		SPEED = SPEED * GameControl.GAMESPEED;
 		
-		x_line = new Texture("x_line.png");
-		y_line = new Texture("y_line.png");
-		rocket = new Texture("bullet.png");
+		x_line = game.assetManager.get("x_line.png", Texture.class);
+        y_line = game.assetManager.get("y_line.png", Texture.class);
+		rocket = game.assetManager.get("bullet.png", Texture.class);
 		
 		this.speed_direction = speed_direction;
 		bullet_rect = new CollisionRect(x, y, WIDTH, HEIGHT);

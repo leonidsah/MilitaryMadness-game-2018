@@ -9,18 +9,18 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.utils.Align;
 import com.imaginegames.mmgame.GameControl;
+import com.imaginegames.mmgame.attachable.ScreenButton;
 
 public class GameOverScreen implements Screen {
 	
-	GameControl game;
-	
-	private float FONT_SCALE = 0.25f;
-	private float FONT2_SCALE = 0.15f;
-	int score, highscore;
-	BitmapFont scoreFont, scoreFont2, scoreFont2_s;
-	GlyphLayout gameover_text, score_text, highscore_text, back_text, back_text_s;
-	private float back_x = Gdx.graphics.getWidth() * 0.03f;
+	private GameControl game;
+
+	private int score, highscore;
+	private BitmapFont score_font, font, font_s;
+	private GlyphLayout gameover_text, score_text, highscore_text, back_text, back_text_s;
+	private float button_x = MainMenuScreen.BUTTON_X;
 	private float back_y = Gdx.graphics.getHeight() * 0.05f;
+	private ScreenButton back_button;
 	
 	public GameOverScreen(GameControl game, int score) {
 		this.game = game;
@@ -33,18 +33,17 @@ public class GameOverScreen implements Screen {
 			prefs.putInteger("highscore", score);
 			prefs.flush();
 		}	
-		scoreFont = new BitmapFont(Gdx.files.internal("fonts/menu_s.fnt"));
-		scoreFont2 = new BitmapFont(Gdx.files.internal("fonts/menu_s.fnt"));
-		scoreFont2_s = new BitmapFont(Gdx.files.internal("fonts/menu.fnt"));
-		scoreFont.getData().setScale(FONT_SCALE);
-		scoreFont2.getData().setScale(FONT2_SCALE);
-		scoreFont2_s.getData().setScale(FONT2_SCALE);
+		score_font = game.assetManager.get("fonts/Play-Bold.ttf", BitmapFont.class);
+		font = game.assetManager.get("fonts/Play-Bold.ttf", BitmapFont.class);
+		font_s = game.assetManager.get("fonts/Play-Bold_S.ttf", BitmapFont.class);
 		
-		gameover_text = new GlyphLayout(scoreFont, "Игра окончена");
-		score_text = new GlyphLayout(scoreFont, "Набрано очков: \n" + score, Color.WHITE, 0, Align.center, false);
-		highscore_text = new GlyphLayout(scoreFont, "Последний рекорд " + highscore + " очков");
-		back_text = new GlyphLayout(scoreFont2, "В главное меню");
-		back_text_s = new GlyphLayout(scoreFont2_s, "В главное меню");
+		gameover_text = new GlyphLayout(score_font, "Игра окончена");
+		score_text = new GlyphLayout(score_font, "Набрано очков: \n" + score, Color.WHITE, 0, Align.center, false);
+		highscore_text = new GlyphLayout(score_font, "Последний рекорд " + highscore + " очков");
+		back_text = new GlyphLayout(font, "В главное меню");
+		back_text_s = new GlyphLayout(font_s, "В главное меню");
+
+		back_button = new ScreenButton(button_x, back_y, back_text.width, back_text.height);
 	}
 	
 	@Override
@@ -54,23 +53,22 @@ public class GameOverScreen implements Screen {
 
 	@Override
 	public void render(float delta) {
-		Gdx.gl.glClearColor(0.300f, 0.300f, 0.745f, 1);
+		Gdx.gl.glClearColor(0.24f, 0.6f, 0.24f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
 		game.batch.begin();
-		scoreFont.draw(game.batch, gameover_text, (Gdx.graphics.getWidth() - gameover_text.width) / 2, Gdx.graphics.getHeight() * 0.8f + gameover_text.height);
-		scoreFont.draw(game.batch, score_text, Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() * 0.55f + score_text.height);
-		scoreFont.draw(game.batch, highscore_text, (Gdx.graphics.getWidth() - highscore_text.width) / 2, Gdx.graphics.getHeight() * 0.425f + highscore_text.height);
-		scoreFont2.draw(game.batch, back_text, back_x, back_y + back_text.height);
+		score_font.draw(game.batch, gameover_text, (Gdx.graphics.getWidth() - gameover_text.width) / 2, Gdx.graphics.getHeight() * 0.8f + gameover_text.height);
+		score_font.draw(game.batch, score_text, Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() * 0.55f + score_text.height);
+		score_font.draw(game.batch, highscore_text, (Gdx.graphics.getWidth() - highscore_text.width) / 2, Gdx.graphics.getHeight() * 0.425f + highscore_text.height);
+		font.draw(game.batch, back_text, button_x, back_y + back_text.height);
 		
 		//Back button
-		if (Gdx.input.getX() > back_x && Gdx.input.getX() <= back_x + back_text.width && Gdx.graphics.getHeight() - Gdx.input.getY() > back_y
-				&& Gdx.graphics.getHeight() - Gdx.input.getY() <= back_y + back_text.height) {
-			scoreFont2_s.draw(game.batch, back_text_s, back_x, back_y + back_text.height);
-			if (Gdx.input.justTouched()) {
-				game.setScreen(new MainMenuScreen(game));
-				this.dispose();
-			}
+		if (back_button.isOnButton(0)) {
+			font_s.draw(game.batch, back_text_s, button_x, back_y + back_text.height);
+		}
+		if (back_button.isReleasedButton(0)) {
+			game.setScreen(new MainMenuScreen(game));
+			this.dispose();
 		}
 		
 		game.batch.end();
