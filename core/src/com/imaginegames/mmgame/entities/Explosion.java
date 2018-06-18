@@ -9,7 +9,7 @@ import com.imaginegames.mmgame.GameControl;
 public class Explosion {
 
 	private GameControl game;
-	private static final int PWIDTH = 128;
+	private static final int PWIDTH = 256;
 	private static final int PHEIGHT = 256;
 	public static float WIDTH;
 	public static float HEIGHT;

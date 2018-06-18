@@ -2,6 +2,7 @@ package com.imaginegames.mmgame.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -39,6 +40,9 @@ public class MainMenuScreen implements Screen{
 
 	private ScreenButton play_button, settings_button, exit_button;
 
+	private Sound go_sound;
+
+
 
 	public MainMenuScreen(GameControl game) {
 		this.game = game;
@@ -72,6 +76,8 @@ public class MainMenuScreen implements Screen{
         play_button = new ScreenButton(BUTTON_X, PLAY_Y, playt.width, playt.height);
         settings_button = new ScreenButton(BUTTON_X, SETTINGS_Y, settingst.width, settingst.height);
         exit_button = new ScreenButton(BUTTON_X, EXIT_Y, exitt.width, exitt.height);
+
+		go_sound = Gdx.audio.newSound(Gdx.files.internal("sounds/go_sound.mp3"));
 
 	}
 
@@ -107,6 +113,7 @@ public class MainMenuScreen implements Screen{
 			font_s.draw(game.batch, playt_s, BUTTON_X, PLAY_Y + playt.height);
 		}
 		if (play_button.isReleasedButton(0)) {
+			go_sound.play(1.0f);
 			game.setScreen(new GameScreen(game));
 			this.dispose();
 		}
@@ -116,6 +123,7 @@ public class MainMenuScreen implements Screen{
 			font_s.draw(game.batch, settingst_s, BUTTON_X, SETTINGS_Y + settingst.height);
 		}
 		if (settings_button.isReleasedButton(0)) {
+			go_sound.play(1.0f);
 			game.setScreen(new SettingsMenuScreen(game));
 			this.dispose();
 		}
@@ -125,6 +133,7 @@ public class MainMenuScreen implements Screen{
 			font_s.draw(game.batch, exitt_s, BUTTON_X, EXIT_Y + exitt.height);
 		}
 		if (exit_button.isReleasedButton(0)) {
+			go_sound.play(1.0f);
 			Gdx.app.exit();
 		}
 		game.batch.end();

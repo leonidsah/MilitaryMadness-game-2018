@@ -6,13 +6,19 @@ import java.util.Random;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Box2D;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.World;
 import com.imaginegames.mmgame.GameControl;
 import com.imaginegames.mmgame.attachable.GameInputProcessor;
 import com.imaginegames.mmgame.attachable.ScreenButton;
@@ -21,7 +27,8 @@ import com.imaginegames.mmgame.entities.Bullet;
 import com.imaginegames.mmgame.entities.Explosion;
 import com.imaginegames.mmgame.entities.Fireball;
 import com.imaginegames.mmgame.tools.CollisionRect;
-import com.imaginegames.mmgame.attachable.DesktopControl;;import net.dermetfan.gdx.physics.box2d.PositionController;
+import com.imaginegames.mmgame.attachable.DesktopControl;;
+import net.dermetfan.gdx.physics.box2d.PositionController;
 
 public class GameScreen implements Screen {
 
@@ -75,7 +82,7 @@ public class GameScreen implements Screen {
 
 	private GameControl game;
 	private Random random;
-	
+
 	private Animation<?>[] rolls;
 	private Texture blank, x_line, y_line, gamepause, shoot_button, move_button, stat_button;
 	private ArrayList<Bullet> bullets;
@@ -98,14 +105,26 @@ public class GameScreen implements Screen {
 	private int roll;
 	float stateTime;
 	
-	private BitmapFont font_info;
-	private GlyphLayout gamespeed, fps_text, xtracker, ytracker, game_score_text, health_text, advantage_text, touch_index;
+	private BitmapFont font, font_info;
+	private GlyphLayout cam_scl_plus, cam_scl_minus, cam_x_plus, cam_x_minus, cam_y_plus, cam_y_minus, cam_rot_plus, cam_rot_minus;
 	private String advantage = "";
 	
 	private DesktopControl desktop_control;
-	//private ScreenButton left, right, up, down, shoot;
+	private ScreenButton left, right, up, down, shoot;
+
+	private Sound cancel_sound;
+
+	/* For input processor
 	public TouchButton left, right, up, down, shoot;
 	private GameInputProcessor inputproc = new GameInputProcessor(this);
+	*/
+
+	//Camera part
+	OrthographicCamera cam;
+
+	//Box2D part
+	World world;
+	Box2DDebugRenderer debugRenderer;
 
 	
 	public GameScreen(GameControl game) {
@@ -135,27 +154,51 @@ public class GameScreen implements Screen {
 		TextureRegion[][] player_animated_sheet = TextureRegion.split(game.assetManager.get("player_normal_sheet.png", Texture.class), PLAYER_PWIDTH, PLAYER_PHEIGHT);
 		rolls[0] = new Animation<>(PLAYER_ANIMATION_SPEED, player_animated_sheet[0]);
 		
-		bullets = new ArrayList<Bullet>();
+		bullets = new ArrayList<>();
 		shootTimer = 1.5f;
-		fireballs = new ArrayList<Fireball>();
-		explosions = new ArrayList<Explosion>();
+		fireballs = new ArrayList<>();
+		explosions = new ArrayList<>();
 
+		font = game.assetManager.get("fonts/Play-Bold.ttf", BitmapFont.class);
         font_info = game.assetManager.get("fonts/Play-Regular_Info.ttf", BitmapFont.class);
+        cam_scl_plus = new GlyphLayout(font, "( + )");
+		cam_scl_minus = new GlyphLayout(font, "( - )");
+		cam_x_plus = new GlyphLayout(font, "->");
+		cam_x_minus = new GlyphLayout(font, "<-");
+		cam_y_plus = new GlyphLayout(font, "/|");
+		cam_y_minus = new GlyphLayout(font, "|/");
+		cam_rot_plus = new GlyphLayout(font, "~)");
+		cam_rot_minus = new GlyphLayout(font, "(~");
 
-        //left = new ScreenButton(LEFT_X, LEFT_Y, MOVE_BUTTON_WIDTH, MOVE_BUTTON_HEIGHT);
-        //right = new ScreenButton(RIGHT_X, RIGHT_Y, MOVE_BUTTON_WIDTH, MOVE_BUTTON_HEIGHT);
-        //up = new ScreenButton(UP_X, UP_Y, MOVE_BUTTON_WIDTH, MOVE_BUTTON_HEIGHT);
-		//down = new ScreenButton(DOWN_X, DOWN_Y, MOVE_BUTTON_WIDTH, MOVE_BUTTON_HEIGHT);
-		//shoot = new ScreenButton(SHOOT_BUTTON_X, SHOOT_BUTTON_Y, SHOOT_BUTTON_WIDTH, SHOOT_BUTTON_HEIGHT);
 
-		left = new TouchButton(LEFT_X, LEFT_Y, MOVE_BUTTON_WIDTH, MOVE_BUTTON_HEIGHT);
-		right = new TouchButton(RIGHT_X, RIGHT_Y, MOVE_BUTTON_WIDTH, MOVE_BUTTON_HEIGHT);
-		up = new TouchButton(UP_X, UP_Y, MOVE_BUTTON_WIDTH, MOVE_BUTTON_HEIGHT);
-		down = new TouchButton(DOWN_X, DOWN_Y, MOVE_BUTTON_WIDTH, MOVE_BUTTON_HEIGHT);
-		shoot = new TouchButton(SHOOT_BUTTON_X, SHOOT_BUTTON_Y, SHOOT_BUTTON_WIDTH, SHOOT_BUTTON_HEIGHT);
+        left = new ScreenButton(LEFT_X, LEFT_Y, MOVE_BUTTON_WIDTH, MOVE_BUTTON_HEIGHT);
+        right = new ScreenButton(RIGHT_X, RIGHT_Y, MOVE_BUTTON_WIDTH, MOVE_BUTTON_HEIGHT);
+        up = new ScreenButton(UP_X, UP_Y, MOVE_BUTTON_WIDTH, MOVE_BUTTON_HEIGHT);
+		down = new ScreenButton(DOWN_X, DOWN_Y, MOVE_BUTTON_WIDTH, MOVE_BUTTON_HEIGHT);
+		shoot = new ScreenButton(SHOOT_BUTTON_X, SHOOT_BUTTON_Y, SHOOT_BUTTON_WIDTH, SHOOT_BUTTON_HEIGHT);
 
+		left = new ScreenButton(LEFT_X, LEFT_Y, MOVE_BUTTON_WIDTH, MOVE_BUTTON_HEIGHT);
+		right = new ScreenButton(RIGHT_X, RIGHT_Y, MOVE_BUTTON_WIDTH, MOVE_BUTTON_HEIGHT);
+		up = new ScreenButton(UP_X, UP_Y, MOVE_BUTTON_WIDTH, MOVE_BUTTON_HEIGHT);
+		down = new ScreenButton(DOWN_X, DOWN_Y, MOVE_BUTTON_WIDTH, MOVE_BUTTON_HEIGHT);
+		shoot = new ScreenButton(SHOOT_BUTTON_X, SHOOT_BUTTON_Y, SHOOT_BUTTON_WIDTH, SHOOT_BUTTON_HEIGHT);
+
+		cancel_sound = Gdx.audio.newSound(Gdx.files.internal("sounds/cancel_sound.mp3"));
+
+		/* For input processor
 		Gdx.input.setInputProcessor(inputproc);
+		 */
 
+		//Camera part
+		cam = new OrthographicCamera(30, 30 * (Gdx.graphics.getHeight() / Gdx.graphics.getWidth()));
+		cam.position.set(cam.viewportWidth / 2, cam.viewportHeight / 2, 0);
+		cam.update();
+		//game.batch.setProjectionMatrix(cam.combined);
+
+		//Box 2D part
+		Box2D.init();
+		world = new World(new Vector2(0, -10), true);
+		debugRenderer = new Box2DDebugRenderer();
 	}
 	
 	@Override
@@ -165,20 +208,20 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void render(float delta) {
-		Gdx.gl.glClearColor(0.690f, 0.878f, 0.902f, 1);
+		Gdx.gl.glClearColor(0.5f, 0.7f, 0.5f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 
 		affected_speed = speed * GameControl.GAMESPEED;
 		desktop_control = new DesktopControl(affected_speed, x, y, PLAYER_DIRECTION, GameControl.SHOW_STAT);
-		
-		gamespeed = new GlyphLayout(font_info, "Скорость x" + GameControl.GAMESPEED);
-		fps_text = new GlyphLayout(font_info, "FPS: " + Gdx.graphics.getFramesPerSecond());
-		xtracker = new GlyphLayout(font_info, "X: " + (int)x);
-		ytracker = new GlyphLayout(font_info, "Y: " + (int)y);
-		game_score_text = new GlyphLayout(font_info, "Попаданий: " + game_score);
-		advantage_text = new GlyphLayout(font_info, " " + advantage);
-		health_text = new GlyphLayout(font_info, "Здоровье: " + (int)(health * 100) + "%");
+
+		GlyphLayout gamespeed = new GlyphLayout(font_info, "Скорость x" + GameControl.GAMESPEED);
+		GlyphLayout fps_text = new GlyphLayout(font_info, "FPS: " + Gdx.graphics.getFramesPerSecond());
+		GlyphLayout xtracker = new GlyphLayout(font_info, "X: " + (int) x);
+		GlyphLayout ytracker = new GlyphLayout(font_info, "Y: " + (int) y);
+		GlyphLayout game_score_text = new GlyphLayout(font_info, "Попаданий: " + game_score);
+		GlyphLayout advantage_text = new GlyphLayout(font_info, " " + advantage);
+		GlyphLayout health_text = new GlyphLayout(font_info, "Здоровье: " + (int) (health * 100) + "%");
 		
 		stat_bar_width = PLAYER_WIDTH * 2.0f;
 		
@@ -197,12 +240,23 @@ public class GameScreen implements Screen {
 		//Shoot and movement buttons
         shootTimer += delta;
 
+		for (int n = 0; n < 2; n++) {
+			if (left.isHoldButton(n)) leftMove();
+			if (right.isHoldButton(n)) rightMove();
+			if (down.isHoldButton(n)) downMove();
+			if (up.isHoldButton(n)) upMove();
+			if (shoot.isHoldButton(n)) doShoot();
+		}
+
+		/* For input processor
 		if (leftMoveFlag) leftMove();
+
 		if (rightMoveFlag) rightMove();
 		if (downMoveFlag) downMove();
 		if (upMoveFlag) upMove();
 		if (doShootFlag) doShoot();
 		System.out.println("leftMoveFlag: " + leftMoveFlag + " | " + "rightMoveFlag: " + rightMoveFlag + " | " + "downMoveFlag: " + downMoveFlag + " | " + "upMoveFlag: " + upMoveFlag );
+		 */
 
 		//Update player collision rect
 		player_rect.move(x, y);
@@ -215,7 +269,7 @@ public class GameScreen implements Screen {
 		}
 
 		//Fireballs update
-		ArrayList<Fireball> fireballs_to_remove = new ArrayList<Fireball>();
+		ArrayList<Fireball> fireballs_to_remove = new ArrayList<>();
 		for (Fireball fireball : fireballs) {
 			fireball.update(delta);
 			if (fireball.remove) {
@@ -224,7 +278,7 @@ public class GameScreen implements Screen {
 		}
 		
 		//Bullets update
-		ArrayList<Bullet> bullets_to_remove = new ArrayList<Bullet>();
+		ArrayList<Bullet> bullets_to_remove = new ArrayList<>();
 		for (Bullet bullet : bullets) {
 			bullet.update(delta);
 			if (bullet.remove) {
@@ -262,7 +316,7 @@ public class GameScreen implements Screen {
 				}
 		//Remove all objects in remove lists (out of bounds or destroyed objects)
 				//Explosions update
-				ArrayList<Explosion> explosions_to_remove = new ArrayList<Explosion>();
+				ArrayList<Explosion> explosions_to_remove = new ArrayList<>();
 				for (Explosion explosion : explosions) {
 					explosion.update(delta);
 					if (explosion.remove) {
@@ -376,9 +430,19 @@ public class GameScreen implements Screen {
 			game.batch.setColor(Color.WHITE);
 		}
 		//Draw interface buttons
+			//Camera buttons
+		font.draw(game.batch, cam_scl_minus, Gdx.graphics.getWidth() - (PANEL_BUTTON_WIDTH * 2 + cam_scl_minus.width),
+                Gdx.graphics.getHeight() - cam_scl_minus.height );
+        font.draw(game.batch, cam_scl_plus, Gdx.graphics.getWidth() - (PANEL_BUTTON_WIDTH * 2 + cam_scl_minus.width + cam_scl_plus.width),
+                Gdx.graphics.getHeight() - cam_scl_plus.height);
+        if (Gdx.input.getX() > GAMEPAUSE_X && Gdx.input.getX() <= GAMEPAUSE_X + PANEL_BUTTON_WIDTH && Gdx.graphics.getHeight() - Gdx.input.getY() > PANEL_BUTTON_Y
+                && Gdx.graphics.getHeight() - Gdx.input.getY() <= PANEL_BUTTON_Y + PANEL_BUTTON_HEIGHT && Gdx.input.justTouched()) {
+
+        }
 			//Pause
 		if (Gdx.input.getX() > GAMEPAUSE_X && Gdx.input.getX() <= GAMEPAUSE_X + PANEL_BUTTON_WIDTH && Gdx.graphics.getHeight() - Gdx.input.getY() > PANEL_BUTTON_Y
 				&& Gdx.graphics.getHeight() - Gdx.input.getY() <= PANEL_BUTTON_Y + PANEL_BUTTON_HEIGHT && Gdx.input.justTouched()) {
+        		cancel_sound.play(1.0f);
 				game.setScreen(new MainMenuScreen(game));
 				this.dispose();
 		}
@@ -396,7 +460,7 @@ public class GameScreen implements Screen {
                 //Up
         game.batch.draw(move_button, UP_X, UP_Y, MOVE_BUTTON_WIDTH / 2, MOVE_BUTTON_HEIGHT / 2, MOVE_BUTTON_WIDTH, MOVE_BUTTON_HEIGHT, 1, 1, 90, 0, 0, MOVE_BUTTON_PWIDTH, MOVE_BUTTON_PHEIGHT, false, false);
 
-        //Draw  X and Y tracking
+		//Draw  X and Y tracking
 		if (GameControl.SHOW_STAT) {
 		    //Cursors tracking
             for (int n = 0; n < 10; n++) {
@@ -406,7 +470,7 @@ public class GameScreen implements Screen {
 
                     game.batch.draw(x_line, Gdx.input.getX(n), Gdx.graphics.getHeight() - Gdx.input.getY(n), 1, -50);
                     game.batch.draw(y_line, Gdx.input.getX(n), Gdx.graphics.getHeight() - Gdx.input.getY(n), -50, 1);
-                    touch_index = new GlyphLayout(font_info, "= " + n);
+					GlyphLayout touch_index = new GlyphLayout(font_info, "= " + n);
                     font_info.draw(game.batch, touch_index,  Gdx.input.getX(n), Gdx.graphics.getHeight() - Gdx.input.getY(n) + 150 + touch_index.height);
                 }
             }
@@ -471,6 +535,9 @@ public class GameScreen implements Screen {
 			font_info.draw(game.batch, advantage_text, game_score_text.width, Gdx.graphics.getHeight() * 0.96f + game_score_text.height);
 		}
 		game.batch.end();
+		//Box 2D part
+		//debugRenderer.render(world, camera.combined);
+		world.step(1/60f, 6, 2);
 	}
 
 	@Override
@@ -499,25 +566,25 @@ public class GameScreen implements Screen {
 	}
 
 	//Actions
-	public void leftMove() {
+	private void leftMove() {
 		x -= affected_speed * Gdx.graphics.getDeltaTime();
 		PLAYER_DIRECTION = -1;
 	}
 
-	public void rightMove() {
+	private void rightMove() {
 		x += affected_speed * Gdx.graphics.getDeltaTime();
 		PLAYER_DIRECTION = 1;
 	}
 
-	public void upMove() {
+	private void upMove() {
 		y += affected_speed * Gdx.graphics.getDeltaTime();
 	}
 
-	public void downMove() {
+	private void downMove() {
 		y -= affected_speed * Gdx.graphics.getDeltaTime();
 	}
 
-	public void doShoot() {
+	private void doShoot() {
 		if (shootTimer >= shoot_cooldown) {
 			shootTimer = 0;
 			if (PLAYER_DIRECTION == 1) {

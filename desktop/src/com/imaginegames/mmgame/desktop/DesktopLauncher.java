@@ -15,7 +15,7 @@ public class DesktopLauncher {
 		config.width = GameControl.WIDTH;
 		config.height = GameControl.HEIGHT;
         config.fullscreen = GameControl.FULLSCREEN;
-		config.title = "Millitary Madness" + " " + GameControl.VERSION;
+		config.title = "Military Madness" + " " + GameControl.VERSION;
 		new LwjglApplication(new GameControl(), config);
 	}
 }

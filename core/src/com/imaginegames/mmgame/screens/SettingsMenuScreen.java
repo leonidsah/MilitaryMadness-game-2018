@@ -2,6 +2,7 @@ package com.imaginegames.mmgame.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
@@ -35,6 +36,8 @@ public class SettingsMenuScreen implements Screen {
 			gamespeed_c, fullscreen, fullscreen_s, unavailable, undead, undead_s;
 
 	private ScreenButton back_button, language_button, xy_button, gamespeed_button, fullscreen_button, undead_button;
+
+	private Sound go_sound, cancel_sound;
 
 	public SettingsMenuScreen(GameControl game) {
 		this.game = game;
@@ -77,6 +80,9 @@ public class SettingsMenuScreen implements Screen {
 		gamespeed_button = new ScreenButton(button_x, gamespeed_y, gamespeed.width, gamespeed.height);
 		fullscreen_button = new ScreenButton(button_x, fullscreen_y, fullscreen.width, fullscreen.height);
 		undead_button = new ScreenButton(button_x, undead_y, undead.width, undead.height);
+
+		go_sound = Gdx.audio.newSound(Gdx.files.internal("sounds/go_sound.mp3"));
+		cancel_sound = Gdx.audio.newSound(Gdx.files.internal("sounds/cancel_sound.mp3"));
 	}
 
 	@Override
@@ -128,6 +134,7 @@ public class SettingsMenuScreen implements Screen {
 			font_s.draw(game.batch, back_s, MainMenuScreen.BUTTON_X, back_y + back.height);
 		}
 		if (back_button.isReleasedButton(0)) {
+			cancel_sound.play(1.0f);
 			game.setScreen(new MainMenuScreen(game));
 			this.dispose();
 		}
@@ -137,6 +144,7 @@ public class SettingsMenuScreen implements Screen {
 			font_s.draw(game.batch, language_s, MainMenuScreen.BUTTON_X, language_y + language.height);
 		}
 		if (language_button.isReleasedButton(0)) {
+			go_sound.play(1.0f);
 			GameControl.ENGLISH_LANGUAGE = !GameControl.ENGLISH_LANGUAGE;
 		}
 
@@ -145,6 +153,7 @@ public class SettingsMenuScreen implements Screen {
 			font_s.draw(game.batch, xy_s, MainMenuScreen.BUTTON_X, xy_y + xy.height);
 		}
 		if (xy_button.isReleasedButton(0)) {
+			go_sound.play(1.0f);
 			GameControl.SHOW_STAT = !GameControl.SHOW_STAT;
 		}
 
@@ -153,6 +162,7 @@ public class SettingsMenuScreen implements Screen {
 			font_s.draw(game.batch, undead_s, MainMenuScreen.BUTTON_X, undead_y + undead.height);
 		}
 		if (undead_button.isReleasedButton(0)) {
+			go_sound.play(1.0f);
 			GameControl.UNDEAD = !GameControl.UNDEAD;
 		}
 		//Game speed
@@ -160,6 +170,7 @@ public class SettingsMenuScreen implements Screen {
 			font_s.draw(game.batch, gamespeed_s, MainMenuScreen.BUTTON_X, gamespeed_y + gamespeed.height);
 		}
 		if (gamespeed_button.isReleasedButton(0)) {
+			go_sound.play(1.0f);
 			if (GameControl.GAMESPEED == 1.0f) {
 				GameControl.GAMESPEED = 0.5f;
 				gamespeed_c = new GlyphLayout(font_c, "x" + GameControl.GAMESPEED);
@@ -177,6 +188,7 @@ public class SettingsMenuScreen implements Screen {
 		if (Gdx.input.getX() > MainMenuScreen.BUTTON_X && Gdx.input.getX() < MainMenuScreen.BUTTON_X + fullscreen.width && Gdx.graphics.getHeight() - Gdx.input.getY() > fullscreen_y && Gdx.graphics.getHeight() - Gdx.input.getY() < fullscreen_y + fullscreen.height) {
 			font_s.draw(game.batch, fullscreen_s, MainMenuScreen.BUTTON_X,fullscreen_y + fullscreen.height);
 			if (Gdx.input.justTouched()) {
+				go_sound.play(1.0f);
 				//Gdx.graphics.setFullscreenMode(null);
 				GameControl.FULLSCREEN = !GameControl.FULLSCREEN;
 			}

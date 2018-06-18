@@ -21,64 +21,68 @@ public class GameInputProcessor extends InputAdapter {
 
     @Override
     public boolean touchDown (int screenX, int screenY, int pointer, int button) {
+        /*
         //Left
-        if (scr.left.isTouchedButton(screenX, screenY)) {
+        if (scr.left.isOnButton(screenX, screenY)) {
             scr.setLeftMoveFlag(true);
         }
 
         //Right
-        if (scr.right.isTouchedButton(screenX, screenY)) {
+        if (scr.right.isOnButton(screenX, screenY)) {
             scr.setRightMoveFlag(true);
         }
 
         //Up
-        if (scr.up.isTouchedButton(screenX, screenY)) {
+        if (scr.up.isOnButton(screenX, screenY)) {
             scr.setUpMoveFlag(true);
         }
 
         //Down
 
-        if (scr.down.isTouchedButton(screenX, screenY)) {
+        if (scr.down.isOnButton(screenX, screenY)) {
             scr.setDownMoveFlag(true);
         }
 
         //Shoot
-        if (scr.shoot.isTouchedButton(screenX, screenY)) {
+        if (scr.shoot.isOnButton(screenX, screenY)) {
             scr.setDoShootFlag(true);
         }
         return true;
-
+        */
+        return false;
     }
 
     @Override
     public boolean touchUp (int screenX, int screenY, int pointer, int button) {
+        /*
         //Left
-        if (scr.left.isTouchedButton(screenX, screenY)) {
+        if (scr.left.isOnButton(screenX, screenY)) {
             scr.setLeftMoveFlag(false);
         }
 
         //Right
-        if (scr.right.isTouchedButton(screenX, screenY)) {
+        if (scr.right.isOnButton(screenX, screenY)) {
             scr.setRightMoveFlag(false);
         }
 
         //Up
-        if (scr.up.isTouchedButton(screenX, screenY)) {
+        if (scr.up.isOnButton(screenX, screenY)) {
             scr.setUpMoveFlag(false);
         }
 
         //Down
 
-        if (scr.down.isTouchedButton(screenX, screenY)) {
+        if (scr.down.isOnButton(screenX, screenY)) {
             scr.setDownMoveFlag(false);
         }
 
         //Shoot
-        if (scr.shoot.isTouchedButton(screenX, screenY)) {
+        if (scr.shoot.isOnButton(screenX, screenY)) {
             scr.setDoShootFlag(false);
         }
         return true;
-
+        */
+        return false;
     }
 
     @Override

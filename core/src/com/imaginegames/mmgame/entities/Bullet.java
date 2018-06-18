@@ -27,7 +27,7 @@ public class Bullet {
 		this.game = game;
 		this.x = x;
 		this.y = y;
-		SPEED = SPEED * GameControl.GAMESPEED;
+		SPEED = 1500 * GameControl.GAMESPEED;
 		
 		x_line = game.assetManager.get("x_line.png", Texture.class);
         y_line = game.assetManager.get("y_line.png", Texture.class);

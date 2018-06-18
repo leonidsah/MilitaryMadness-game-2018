@@ -136,9 +136,11 @@ public class LoadingScreen implements Screen {
 
         //Shadow
         if (game.assetManager.isLoaded("shadow.png", Texture.class)) {
+            game.batch.setColor(Color.BLACK);
             game.batch.draw(game.assetManager.get("shadow.png", Texture.class), 0,0, Gdx.graphics.getWidth(), shadow_height);
 
             game.batch.draw(game.assetManager.get("shadow.png", Texture.class), 0,Gdx.graphics.getHeight(), Gdx.graphics.getWidth(), -shadow_height);
+            game.batch.setColor(Color.WHITE);
         }
 
         //Blank (Progress bar)
