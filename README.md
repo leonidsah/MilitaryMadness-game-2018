@@ -1,2 +1,2 @@
-# mmgame
-Millitary Madness (MM) - Arcade game creating by 15 y.o. java student
+# myGame
+My game that I was creating when I was 15 years old
